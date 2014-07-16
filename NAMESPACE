@@ -1,0 +1,7 @@
+useDynLib(TKF, .registration = TRUE)
+
+
+### -----------------------------------------------------------------
+### Export non-generic functions
+###
+
