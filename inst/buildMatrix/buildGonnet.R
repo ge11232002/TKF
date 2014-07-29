@@ -4,6 +4,7 @@
 # mail: gtan@me.com
 # Created Time: Tue Jul 29 21:55:22 2014
 #########################################################################
+## This script is used to create the mutation matrix of GONNET at PAM 1.
 
 transitionPAM1 <- read.table("daymatrix.txt", header=FALSE)
 transitionPAM1 <- as.matrix(transitionPAM1)

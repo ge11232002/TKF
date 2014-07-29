@@ -1,5 +1,7 @@
 useDynLib(TKF, .registration = TRUE)
 
+### Import ordinary functions from other packages
+importFrom(expm, expm.Higham08, logm)
 
 ### -----------------------------------------------------------------
 ### Export non-generic functions
