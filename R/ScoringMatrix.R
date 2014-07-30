@@ -77,7 +77,7 @@ PAMn <- function(PAM1, n){
 ### P("alignment i and j arose through evolution") /  P("alignment i and j arose by chance")
 ###
 Dayhoffn <- function(PAM1, BF, n){
-  ## Validated by Darwin
+  ## Verified by Darwin
   require(expm)
   .validatePAMMatrix(PAM1)
   .validateBF(BF)
