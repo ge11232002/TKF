@@ -9,6 +9,10 @@
 #include<gsl/gsl_matrix.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
+#include <gsl/gsl_complex_math.h>
+#include <gsl/gsl_permutation.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h> 
 #include "matrix.h"
 
 /*-------------------------------------------------------------------
@@ -45,52 +49,65 @@ int printGSLMatrix(const gsl_matrix *m){
 //}
 
 /********************************************************************
- * Matrix logarithm only for diagonalizable matrix.
+ * Mutation probability matrix for PAM distance 
  * *****************************************************************/
 
-void logm(gsl_matrix *m, gsl_matrix *mlog){
+void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
   int nrow;
-  //int i;
+  int i, j;
   nrow = m->size1;
+  gsl_matrix *m2 = gsl_matrix_alloc(nrow, nrow);
+  gsl_matrix_memcpy(m2, m);
   gsl_vector_complex *eval = gsl_vector_complex_alloc(nrow);
   gsl_matrix_complex *evec = gsl_matrix_complex_alloc (nrow, nrow);
   gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(nrow);
-  gsl_eigen_nonsymmv(m, eval, evec, w);
+  gsl_eigen_nonsymmv(m2, eval, evec, w);
   
   // free the eigen nonsymmv workspace
   gsl_eigen_nonsymmv_free(w);
+
   gsl_eigen_nonsymmv_sort(eval, evec,
       GSL_EIGEN_SORT_ABS_DESC);
- 
-  {
-    int i, j;
 
-    for (i = 0; i < 20; i++)
-      {
-        gsl_complex eval_i 
-           = gsl_vector_complex_get (eval, i);
-        gsl_vector_complex_view evec_i 
-           = gsl_matrix_complex_column (evec, i);
-
-        printf ("eigenvalue = %g + %gi\n",
-                GSL_REAL(eval_i), GSL_IMAG(eval_i));
-        printf ("eigenvector = \n");
-        for (j = 0; j < 20; ++j)
-          {
-            gsl_complex z = 
-              gsl_vector_complex_get(&evec_i.vector, j);
-            printf("%g + %gi\n", GSL_REAL(z), GSL_IMAG(z));
-          }
+  // build the diagonal matrix with pow(eval, distance)
+  gsl_matrix_complex *diagMatrix = gsl_matrix_complex_calloc(nrow, nrow);
+  for(i = 0; i < nrow; i++){
+    for(j = 0; j < nrow; j++){
+      if(i == j){
+        gsl_matrix_complex_set(diagMatrix, i, j, 
+            gsl_complex_pow_real(gsl_vector_complex_get(eval, i), distance));
       }
+    }
   }
+  // invert the eigen vector matrix
+  int s;
+  gsl_matrix_complex *evecinv = gsl_matrix_complex_calloc(nrow, nrow);
+  gsl_permutation *p = gsl_permutation_alloc(nrow);
+  gsl_linalg_complex_LU_decomp(evec, p, &s);
+  gsl_linalg_complex_LU_invert(evec, p, evecinv);
+  
+  // matrix multiplication
+  gsl_matrix_complex *mPAMComplex = gsl_matrix_complex_alloc(nrow, nrow);
+  gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, 
+      evec, diagMatrix, GSL_COMPLEX_ZERO, mPAMComplex);
+  gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE,
+      mPAMComplex, evecinv, GSL_COMPLEX_ZERO, mPAMComplex);
 
-  gsl_vector_complex *evalLog = gsl_vector_complex_alloc(nrow);
-  //for(i = 0; i < nrow; i++){
-  //  gsl_vector_set(evalLog, i, gsl_vector_get ());
-  //}
+  for(i = 0; i < nrow; i++){
+    for(j = 0; j < nrow; j++){
+      gsl_matrix_set(mPAM, i, j, 
+          GSL_REAL(gsl_matrix_complex_get(mPAMComplex, i, j))   );
+    }
+  }
+  // printf("%g + %gi\n", GSL_REAL(z), GSL_IMAG(z));
+
   // free the allocated eigen values and vectors
   gsl_vector_complex_free(eval);
   gsl_matrix_complex_free(evec);
-  gsl_vector_complex_free(evalLog);
+  gsl_matrix_complex_free(diagMatrix);
+  gsl_matrix_complex_free(mPAMComplex);
+  gsl_matrix_complex_free(evecinv);
+  gsl_permutation_free(p);
+  gsl_matrix_free(m2);
 }
 

@@ -14,6 +14,8 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
   int ncol, nrow;
   ncol = INTEGER(GET_DIM(probMatR))[1];
   nrow = INTEGER(GET_DIM(probMatR))[0];
+  double distance;
+  distance = REAL(distanceR)[0];
   int i, j; 
   // matrix allocation and setting
   gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
@@ -23,9 +25,12 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
       gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
   
   // print the GSL matrix
-  //printGSLMatrix(probMat);
-  logm(probMat, probMatN); 
-
+  printGSLMatrix(probMat);
+  printf("\n");
+  PAMn(probMat, distance, probMatN); 
+  printGSLMatrix(probMat);
+  printf("\n");
+  printGSLMatrix(probMatN);
   // free the GSL matrix
   gsl_matrix_free(probMat);
   gsl_matrix_free(probMatN);
