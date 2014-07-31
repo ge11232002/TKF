@@ -17,16 +17,18 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
   int i, j; 
   // matrix allocation and setting
   gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
+  gsl_matrix *probMatN = gsl_matrix_alloc(nrow, ncol);
   for(i = 0; i < nrow; i++) 
     for(j = 0; j < ncol; j++)
       gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
   
   // print the GSL matrix
-  printGSLMatrix(probMat);
- 
+  //printGSLMatrix(probMat);
+  logm(probMat, probMatN); 
 
   // free the GSL matrix
   gsl_matrix_free(probMat);
+  gsl_matrix_free(probMatN);
 
   Rprintf("the ncol is %d\n", ncol);
   Rprintf("the nrow is %d\n", nrow);
