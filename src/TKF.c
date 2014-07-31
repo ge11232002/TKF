@@ -25,10 +25,10 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
       gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
   
   // print the GSL matrix
-  printGSLMatrix(probMat);
+  //printGSLMatrix(probMat);
   printf("\n");
   PAMn(probMat, distance, probMatN); 
-  printGSLMatrix(probMat);
+  //printGSLMatrix(probMat);
   printf("\n");
   printGSLMatrix(probMatN);
   // free the GSL matrix
