@@ -53,20 +53,25 @@ int printGSLMatrixComplex(const gsl_matrix_complex *m){
 //}
 
 /********************************************************************
- * Make diagonal matrix from vector
+ * Make diagonal matrix from vector for Real and Complex data
  * *****************************************************************/
-
-//void *my_diag_alloc(const gsl_vector_complex *X, gsl_matrix_complex *mat)
-//{
-//    gsl_vector_complex_view diag = gsl_matrix_diagonal(mat);
-//    gsl_matrix_set_all(mat, 0.0); //or whatever number you like
-//    gsl_vector_memcpy(&diag.vector, X);
-//}
+void asDiagonalComplex(const gsl_vector_complex *X, gsl_matrix_complex *mat){
+  int i, j;
+  int nrow = mat->size1;
+  for(i = 0; i < nrow; i++){
+    for(j = 0; j < nrow; j++){
+      if(i == j){
+        gsl_matrix_complex_set(mat, i, j,
+            gsl_vector_complex_get(X, i));
+      }
+    }
+  }
+}
 
 /********************************************************************
  * Matrix inverse for Real and Complex
  * *****************************************************************/
-void gsl_matrix_inverse(gsl_matrix *m, gsl_matrix *minvert){
+void gsl_matrix_inverse(const gsl_matrix *m, gsl_matrix *minvert){
   int s;
   gsl_matrix *b = gsl_matrix_alloc(m->size1, m->size2);
   gsl_permutation *p = gsl_permutation_alloc(m->size1);
@@ -77,8 +82,9 @@ void gsl_matrix_inverse(gsl_matrix *m, gsl_matrix *minvert){
   gsl_permutation_free(p);
 }
 
-void gsl_matrix_complex_inverse(gsl_matrix_complex *m, 
+void gsl_matrix_complex_inverse(const gsl_matrix_complex *m, 
     gsl_matrix_complex *minvert){
+  // validated.
   int s;
   gsl_matrix_complex *b = gsl_matrix_complex_alloc(m->size1, m->size2);
   gsl_permutation *p = gsl_permutation_alloc(m->size1);
@@ -91,10 +97,10 @@ void gsl_matrix_complex_inverse(gsl_matrix_complex *m,
 
 
 /********************************************************************
- * Mutation probability matrix for PAM distance 
+ * Generate mutation probability matrix for PAM distance from PAM1 matrix
  * *****************************************************************/
 
-void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
+void PAMn(const gsl_matrix *m, const double distance, gsl_matrix *mPAM){
   int nrow;
   int i, j;
   nrow = m->size1;

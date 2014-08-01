@@ -10,6 +10,6 @@
 
 
 int printGSLMatrix(const gsl_matrix *m);
-void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM);
+void PAMn(const gsl_matrix *m, const double distance, gsl_matrix *mPAM);
 
 //gsl_matrix *PAMnC(gsl_matrix *PAM1, const int n);
