@@ -73,9 +73,9 @@ void create_identity_matrix(gsl_matrix_complex *I){
   for(i = 0; i < nrow; i++){
     for(j = 0;j < nrow; j++){
       if(i == j){
-        matrix_complex_set(I, i, j, complex_rect(1,0));
+        gsl_matrix_complex_set(I, i, j, gsl_complex_rect(1,0));
       }else{
-        matrix_complex_set(I, i, j, complex_rect(0,0));
+        gsl_matrix_complex_set(I, i, j, gsl_complex_rect(0,0));
       }
     }
   }
@@ -86,19 +86,19 @@ void create_identity_matrix(gsl_matrix_complex *I){
  * Not verified yet.
  * ******************************************************************/
 //matrix + matrix
-void matrix_add(matrix *c, const matrix *a, const matrix *b){
+void matrix_add(gsl_matrix *c, const gsl_matrix *a, const gsl_matrix *b){
   gsl_matrix_memcpy(c, a);
   gsl_matrix_add(c, b);
 }
 
 //matrix - matrix
-void matrix_sub(gsl_matrix *c, const matrix *a, const matrix *b){
-  gsl_matrix_memcpy(c, a ;
+void matrix_sub(gsl_matrix *c, const gsl_matrix *a, const gsl_matrix *b){
+  gsl_matrix_memcpy(c, a);
   gsl_matrix_sub(c, b);
 }
 
 //matrix + constant
-void matrix_add_constant(matrix* c, matrix *a, const double x) {
+void matrix_add_constant(gsl_matrix* c, gsl_matrix *a, const double x) {
   gsl_matrix_memcpy(c, a);
   gsl_matrix_add_constant(c, x);
 }
@@ -119,7 +119,7 @@ void matrix_complex_sub(gsl_matrix_complex *c, const gsl_matrix_complex *a,
 
 //complex matrix + constant
 void matrix_complex_add_constant(gsl_matrix_complex *c, gsl_matrix_complex *a, 
-    complex x){
+    gsl_complex x){
   gsl_matrix_complex_memcpy(c, a);
   gsl_matrix_complex_add_constant(c, x);
 }
@@ -162,8 +162,8 @@ void gsl_matrix_complex_conjug(gsl_matrix_complex *c,
   int i,j;
   for(i = 0; i< c->size1; i++){
     for(j = 0; j < c->size2; j++){
-      complex *p = matrix_complex_ptr(c, i, j);
-      *p = complex_conj(*p);
+      gsl_complex *p = gsl_matrix_complex_ptr(c, i, j);
+      *p = gsl_complex_conjugate(*p);
     }
   }
 }
