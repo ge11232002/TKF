@@ -64,6 +64,33 @@ int printGSLMatrixComplex(const gsl_matrix_complex *m){
 //}
 
 /********************************************************************
+ * Matrix inverse for Real and Complex
+ * *****************************************************************/
+void gsl_matrix_inverse(gsl_matrix *m, gsl_matrix *minvert){
+  int s;
+  gsl_matrix *b = gsl_matrix_alloc(m->size1, m->size2);
+  gsl_permutation *p = gsl_permutation_alloc(m->size1);
+  gsl_matrix_memcpy(b, m);
+  gsl_linalg_LU_decomp(b, p, &s);
+  gsl_linalg_LU_invert(b, p, minvert);
+  gsl_matrix_free(b);
+  gsl_permutation_free(p);
+}
+
+void gsl_matrix_complex_inverse(gsl_matrix_complex *m, 
+    gsl_matrix_complex *minvert){
+  int s;
+  gsl_matrix_complex *b = gsl_matrix_complex_alloc(m->size1, m->size2);
+  gsl_permutation *p = gsl_permutation_alloc(m->size1);
+  gsl_matrix_complex_memcpy(b, m);
+  gsl_linalg_complex_LU_decomp(b, p, &s);
+  gsl_linalg_complex_LU_invert(b, p, minvert);
+  gsl_matrix_complex_free(b);
+  gsl_permutation_free(p);
+}
+
+
+/********************************************************************
  * Mutation probability matrix for PAM distance 
  * *****************************************************************/
 
@@ -84,30 +111,9 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
   gsl_eigen_nonsymmv_sort(eval, evec,
       GSL_EIGEN_SORT_ABS_DESC);
 
-  // print the evec
-{
-    int i, j;
-
-    for (i = 0; i < 20; i++)
-      {
-        gsl_complex eval_i 
-           = gsl_vector_complex_get (eval, i);
-        gsl_vector_complex_view evec_i 
-           = gsl_matrix_complex_column (evec, i);
-
-        printf ("eigenvalue = %g + %gi\n",
-                GSL_REAL(eval_i), GSL_IMAG(eval_i));
-        printf ("eigenvector = \n");
-        for (j = 0; j < 20; ++j)
-          {
-            gsl_complex z = 
-              gsl_vector_complex_get(&evec_i.vector, j);
-            printf("%g + %gi\n", GSL_REAL(z), GSL_IMAG(z));
-          }
-      }
-  }
-  
+  printf("The eigen matrix1 \n");
   printGSLMatrixComplex(evec);
+  
   // build the diagonal matrix with pow(eval, distance)
   gsl_matrix_complex *diagMatrix = gsl_matrix_complex_calloc(nrow, nrow);
   for(i = 0; i < nrow; i++){
@@ -119,20 +125,24 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
     }
   }
   // invert the eigen vector matrix
-  int s;
   gsl_matrix_complex *evecinv = gsl_matrix_complex_calloc(nrow, nrow);
-  gsl_permutation *p = gsl_permutation_alloc(nrow);
-  gsl_linalg_complex_LU_decomp(evec, p, &s);
-  gsl_linalg_complex_LU_invert(evec, p, evecinv);
+  gsl_matrix_complex_inverse(evec, evecinv);
 
+  printf("The eigen matrix2 \n");
+  printGSLMatrixComplex(evec);
+  printf("The inverse matrix\n");
   printGSLMatrixComplex(evecinv); 
 
   // matrix multiplication
   gsl_matrix_complex *mPAMComplex = gsl_matrix_complex_alloc(nrow, nrow);
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, 
       evec, diagMatrix, GSL_COMPLEX_ZERO, mPAMComplex);
+  printf("The first part \n");
+  printGSLMatrixComplex(mPAMComplex);
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE,
       mPAMComplex, evecinv, GSL_COMPLEX_ZERO, mPAMComplex);
+  printf("The second part \n");
+  printGSLMatrixComplex(mPAMComplex);
 
   for(i = 0; i < nrow; i++){
     for(j = 0; j < nrow; j++){
@@ -148,7 +158,6 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
   gsl_matrix_complex_free(diagMatrix);
   gsl_matrix_complex_free(mPAMComplex);
   gsl_matrix_complex_free(evecinv);
-  gsl_permutation_free(p);
   gsl_matrix_free(m2);
 }
 
