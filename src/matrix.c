@@ -111,9 +111,6 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
   gsl_eigen_nonsymmv_sort(eval, evec,
       GSL_EIGEN_SORT_ABS_DESC);
 
-  printf("The eigen matrix1 \n");
-  printGSLMatrixComplex(evec);
-  
   // build the diagonal matrix with pow(eval, distance)
   gsl_matrix_complex *diagMatrix = gsl_matrix_complex_calloc(nrow, nrow);
   for(i = 0; i < nrow; i++){
@@ -121,6 +118,7 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
       if(i == j){
         gsl_matrix_complex_set(diagMatrix, i, j, 
             gsl_complex_pow_real(gsl_vector_complex_get(eval, i), distance));
+        //gsl_complex_log(gsl_vector_complex_get(eval, i)));
       }
     }
   }
@@ -128,35 +126,27 @@ void PAMn(gsl_matrix *m, double distance, gsl_matrix *mPAM){
   gsl_matrix_complex *evecinv = gsl_matrix_complex_calloc(nrow, nrow);
   gsl_matrix_complex_inverse(evec, evecinv);
 
-  printf("The eigen matrix2 \n");
-  printGSLMatrixComplex(evec);
-  printf("The inverse matrix\n");
-  printGSLMatrixComplex(evecinv); 
-
   // matrix multiplication
   gsl_matrix_complex *mPAMComplex = gsl_matrix_complex_alloc(nrow, nrow);
+  gsl_matrix_complex *mPAMComplex2 = gsl_matrix_complex_alloc(nrow, nrow);
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, 
       evec, diagMatrix, GSL_COMPLEX_ZERO, mPAMComplex);
-  printf("The first part \n");
-  printGSLMatrixComplex(mPAMComplex);
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE,
-      mPAMComplex, evecinv, GSL_COMPLEX_ZERO, mPAMComplex);
-  printf("The second part \n");
-  printGSLMatrixComplex(mPAMComplex);
+      mPAMComplex, evecinv, GSL_COMPLEX_ZERO, mPAMComplex2);
 
   for(i = 0; i < nrow; i++){
     for(j = 0; j < nrow; j++){
       gsl_matrix_set(mPAM, i, j, 
-          GSL_REAL(gsl_matrix_complex_get(mPAMComplex, i, j))   );
+          GSL_REAL(gsl_matrix_complex_get(mPAMComplex2, i, j))   );
     }
   }
-  // printf("%g + %gi\n", GSL_REAL(z), GSL_IMAG(z));
 
   // free the allocated eigen values and vectors
   gsl_vector_complex_free(eval);
   gsl_matrix_complex_free(evec);
   gsl_matrix_complex_free(diagMatrix);
   gsl_matrix_complex_free(mPAMComplex);
+  gsl_matrix_complex_free(mPAMComplex2);
   gsl_matrix_complex_free(evecinv);
   gsl_matrix_free(m2);
 }

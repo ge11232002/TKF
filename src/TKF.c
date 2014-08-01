@@ -24,19 +24,14 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
     for(j = 0; j < ncol; j++)
       gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
   
-  // print the GSL matrix
-  //printGSLMatrix(probMat);
-  printf("\n");
   PAMn(probMat, distance, probMatN); 
-  //printGSLMatrix(probMat);
-  printf("\n");
-  //printGSLMatrix(probMatN);
+  printGSLMatrix(probMatN);
+  
+  
   // free the GSL matrix
   gsl_matrix_free(probMat);
   gsl_matrix_free(probMatN);
 
-  Rprintf("the ncol is %d\n", ncol);
-  Rprintf("the nrow is %d\n", nrow);
   return R_NilValue;
 }
 
