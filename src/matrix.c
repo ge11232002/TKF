@@ -15,9 +15,9 @@
 #include <gsl/gsl_blas.h> 
 #include "matrix.h"
 
-/*-------------------------------------------------------------------
+/*********************************************************************
  * Print a GSL matrix in a proper shape
- * ----------------------------------------------------------------*/
+ ********************************************************************/
 int printGSLMatrix(const gsl_matrix *m){
   int status, n = 0;
   for(size_t i = 0; i < m->size1; i++){
@@ -48,10 +48,6 @@ int printGSLMatrixComplex(const gsl_matrix_complex *m){
   return n;
 }
 
-//gsl_matrix *PAMnC(gsl_matrix *PAM1, const int n){
-
-//}
-
 /********************************************************************
  * Make diagonal matrix from vector for Real and Complex data
  * *****************************************************************/
@@ -67,6 +63,67 @@ void asDiagonalComplex(const gsl_vector_complex *X, gsl_matrix_complex *mat){
     }
   }
 }
+
+/********************************************************************
+ * Create identity complex matrix
+ * *****************************************************************/
+void create_identity_matrix(gsl_matrix_complex *I){
+  int i,j;
+  int nrow;
+  for(i = 0; i < nrow; i++){
+    for(j = 0;j < nrow; j++){
+      if(i == j){
+        matrix_complex_set(I, i, j, complex_rect(1,0));
+      }else{
+        matrix_complex_set(I, i, j, complex_rect(0,0));
+      }
+    }
+  }
+}
+
+/*********************************************************************
+ * Matrix add/sub, taken from http://mimo-coherent-with-c.googlecode.com/svn-history/r60/trunk/moperations.h
+ * Not verified yet.
+ * ******************************************************************/
+//matrix + matrix
+void matrix_add(matrix *c, const matrix *a, const matrix *b){
+  gsl_matrix_memcpy(c, a);
+  gsl_matrix_add(c, b);
+}
+
+//matrix - matrix
+void matrix_sub(gsl_matrix *c, const matrix *a, const matrix *b){
+  gsl_matrix_memcpy(c, a ;
+  gsl_matrix_sub(c, b);
+}
+
+//matrix + constant
+void matrix_add_constant(matrix* c, matrix *a, const double x) {
+  gsl_matrix_memcpy(c, a);
+  gsl_matrix_add_constant(c, x);
+}
+
+//complex matrix + complex matrix
+void matrix_complex_add(gsl_matrix_complex *c, const gsl_matrix_complex *a, 
+  const gsl_matrix_complex *b){
+  gsl_matrix_complex_memcpy(c, a);
+  gsl_matrix_complex_add(c, b);
+}
+
+//complex matrix - complex matrix
+void matrix_complex_sub(gsl_matrix_complex *c, const gsl_matrix_complex *a, 
+  const gsl_matrix_complex *b){
+  gsl_matrix_complex_memcpy(c, a);
+  gsl_matrix_complex_sub(c, b);
+}
+
+//complex matrix + constant
+void matrix_complex_add_constant(gsl_matrix_complex *c, gsl_matrix_complex *a, 
+    complex x){
+  gsl_matrix_complex_memcpy(c, a);
+  gsl_matrix_complex_add_constant(c, x);
+}
+
 
 /********************************************************************
  * Matrix inverse for Real and Complex
@@ -95,6 +152,21 @@ void gsl_matrix_complex_inverse(const gsl_matrix_complex *m,
   gsl_permutation_free(p);
 }
 
+/*********************************************************************
+ * Matrix conjug for Real and Complex
+ * Not verified yet.
+ * ******************************************************************/
+void gsl_matrix_complex_conjug(gsl_matrix_complex *c, 
+    gsl_matrix_complex *a){
+  gsl_matrix_complex_memcpy(c, a);
+  int i,j;
+  for(i = 0; i< c->size1; i++){
+    for(j = 0; j < c->size2; j++){
+      complex *p = matrix_complex_ptr(c, i, j);
+      *p = complex_conj(*p);
+    }
+  }
+}
 
 /********************************************************************
  * Generate mutation probability matrix for PAM distance from PAM1 matrix
