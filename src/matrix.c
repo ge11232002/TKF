@@ -14,6 +14,8 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h> 
 #include "matrix.h"
+#include "TKF.h" // for Eps
+#include <assert.h> // for assert
 
 /*********************************************************************
  * Print a GSL matrix in a proper shape
@@ -214,6 +216,8 @@ void PAMn(const gsl_matrix *m, const double distance, gsl_matrix *mPAM){
 
   for(i = 0; i < nrow; i++){
     for(j = 0; j < nrow; j++){
+      // The matrix should be almost real!
+      assert(GSL_IMAG(gsl_matrix_complex_get(mPAMComplex2, i, j)) < Eps);
       gsl_matrix_set(mPAM, i, j, 
           GSL_REAL(gsl_matrix_complex_get(mPAMComplex2, i, j))   );
     }
