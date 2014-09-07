@@ -21,7 +21,7 @@ seq1Int <- seq1Int - 1L
 seq2Int <- seq2Int - 1L
 mu = 0.0013
 expectedLength = 362
-.Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET)
+.Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET, GONNETBF)
 
 
 
