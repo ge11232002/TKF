@@ -27,11 +27,12 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
+  Rprintf("hello\n");
   gsl_matrix *substModel = p->substModel;
   gsl_vector *eqFrequencies = p->eqFrequencies;
   gsl_vector *seq1Int = p->seq1Int;
   gsl_vector *seq2Int = p->seq2Int;
-  
+  Rprintf("hello2\n"); 
   double lambda = len / (len + 1) * mu;
   double alpha = -mu * distance;
   double lmt = exp((lambda-mu)*distance);
@@ -41,7 +42,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   double lP11t = log1x(-exp(alpha) - mu * beta) + log1x(-lambda * beta);
   double lP12t = log1x(-lambda * beta); 
   double lP01t = log(mu) + lbeta;
- 
+  Rprintf("hello3\n"); 
   // initialize the entries tables, only log-likelihood is stored in thie table
   int SA = seq1Int->size;
   int SB = seq2Int->size;
@@ -53,6 +54,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   gsl_matrix_set(L0, 0, 0, -INFINITY);
   gsl_matrix_set(L2, 0, 0, -INFINITY);
   gsl_matrix_set(L1, 0, 0, lP12t + log1x(-lambda/mu));
+
   int i, j;
   double temp = 0;
   for(i = 1; i <= SA; i++){
@@ -69,7 +71,10 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
     gsl_matrix_set(L1, 0, j, -INFINITY);
     gsl_matrix_set(L0, 0, j, -INFINITY);
   }
-
+  printGSLMatrix(L0);
+  printGSLMatrix(L1);
+  printGSLMatrix(L2);
+  Rprintf("hello4\n");
   //recursive iteration
   for(i = 1; i <= SA; i++){
     for(j = 1; j <= SB; j++){
@@ -87,6 +92,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
       }
     }
   }
+  Rprintf("hello5\n");
   temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, SA, SB), gsl_matrix_get(L1, SA, SB)), gsl_matrix_get(L2, SA, SB));
   double likelihood;
   likelihood = -(temp + log(exp(gsl_matrix_get(L0, SA, SB) - temp) + exp(gsl_matrix_get(L1, SA, SB) - temp) + exp(gsl_matrix_get(L2, SA, SB) - temp)));
@@ -94,11 +100,12 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   gsl_matrix_free(L0);
   gsl_matrix_free(L1);
   gsl_matrix_free(L2);
-
+  Rprintf("hello6\n");
+  Rprintf("\%f\n", likelihood);
   return likelihood;
 }
 
-SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP mu,
+SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP muR,
     SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
   int ncol, nrow;
   ncol = INTEGER(GET_DIM(probMatR))[1];
@@ -129,24 +136,26 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP mu,
     gsl_vector_set(seq2IntGSL, i, INTEGER(seq2Int)[i]);
   }
 
-  //for(i = 0; i < seq1IntGSL->size; i++){
-  // printf ("v_%d = %g\n", i, gsl_vector_get (seq1IntGSL, i));
-  //}
+  for(i = 0; i < seq1IntGSL->size; i++){
+   printf ("v_%d = %g\n", i, gsl_vector_get (seq1IntGSL, i));
+  }
   // GSL minimizer 
-  /*int status;
+  int status;
   int iter = 0, max_iter = 100;
   const gsl_min_fminimizer_type *T;
   gsl_min_fminimizer *s;
   gsl_function F;
-  struct TKF91LikelihoodFunction1D_params *params;
-  params->len = REAL(expectedLength)[0];
-  params->mu = REAL(mu)[0];
-  params->substModel = probMat;
-  params->eqFrequencies = eqFrequencies;
-  params->seq1Int = seq1IntGSL;
-  params->seq2Int = seq2IntGSL;
+  struct TKF91LikelihoodFunction1D_params params;
+  //double mu = REAL(muR)[0];
+  //double length = REAL(expectedLength)[0];
+  params.len = REAL(expectedLength)[0];
+  params.mu = REAL(muR)[0];
+  params.substModel = probMat;
+  params.eqFrequencies = eqFrequencies;
+  params.seq1Int = seq1IntGSL;
+  params.seq2Int = seq2IntGSL;
   F.function = &TKF91LikelihoodFunction1D;
-  F.params = params;
+  F.params = &params;
   double x_lo = 0, x_hi = 100000; 
   double x = 0.11;
   double mEps = 0.001;
@@ -159,7 +168,8 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP mu,
   printf("%5s [%9s, %9s] %9s %10s %9s\n",
       "iter", "lower", "upper", "min", 
       "err", "err(est)");
-  do
+  
+  /*do
     {
       iter++;
       status = gsl_min_fminimizer_iterate (s);

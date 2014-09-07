@@ -12,7 +12,7 @@ dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
 ## Read fasta
 library(seqinr)
-fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
+fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair2.fasta" , seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 seq1Int = AAToInt(seq1)
