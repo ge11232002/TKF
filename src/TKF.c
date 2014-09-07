@@ -10,7 +10,7 @@
 #include "Rdefines.h"
 #include "matrix.h"
 
-SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
+SEXP TKF91LikelihoodFunction1DMain(SEXP distanceR, SEXP probMatR){
   int ncol, nrow;
   ncol = INTEGER(GET_DIM(probMatR))[1];
   nrow = INTEGER(GET_DIM(probMatR))[0];
@@ -36,5 +36,11 @@ SEXP TKF91LikelihoodFunction1D(SEXP distanceR, SEXP probMatR){
 }
 
 
+
+double TKF91LikelihoodFunction1D(char *seq1sp, char *seq2sp, 
+    gsl_matrix *substModel, double len, double Mu, double distance){
+  
+  return 0.1;
+}
 
 
