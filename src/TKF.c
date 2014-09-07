@@ -43,15 +43,20 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   double alpha = -mu * distance;
   Rprintf("alpha %f\n", alpha);
   double lmt = exp((lambda-mu)*distance);
-  double lbeta = log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
+  double lbeta = log(lambda) + log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
   double testBeat = (1.0 - exp((lambda - mu) * distance)) / (mu - lambda * exp((lambda - mu) * distance));
   Rprintf("lbeta %f\n", lbeta);
+  Rprintf("mybeta %f\n", exp(lbeta));
   Rprintf("testBeat %f\n", testBeat);
   double beta = exp(lbeta); // beta is  not a very small number.
   double P1t = exp(- mu * distance) * (1 - lambda * beta);
+  Rprintf("P1t %f\n",P1t);
   double lP12t = log1x(-lambda * beta); 
   double lP01t = log(mu) + lbeta;
   double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
+  double P11tTest = (1.0 - exp(- mu * distance) - mu * beta) * (1.0 - lambda * beta);
+  Rprintf("P11t %f\n",P11t);
+  Rprintf("P11tTest %f\n",P11tTest);
   Rprintf("hello3\n"); 
   // initialize the entries tables, only log-likelihood is stored in thie table
   int SA = seq1Int->size;
@@ -101,9 +106,26 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
           gsl_matrix_get(L2, i-1, j));
       gsl_matrix_set(L0, i, j, log(lambda) - log(mu) + log(gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq1Int, i-1))) + lP01t + temp + log(exp(gsl_matrix_get(L0, i-1, j) - temp) + exp(gsl_matrix_get(L1, i-1, j) - temp) + exp(gsl_matrix_get(L2, i-1, j) - temp)));
       temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, i-1, j-1), gsl_matrix_get(L1, i-1, j-1)), gsl_matrix_get(L2, i-1, j-1));
+      // debug here
+      if(i ==1 && j== 3){
+        Rprintf("so far %f\n", log(lambda) - log(mu) + log(gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq1Int, i-1))));
+        Rprintf("so far2 %f\n", gsl_matrix_get(substModel, (int) gsl_vector_get(seq1Int, i-1), (int) gsl_vector_get(seq2Int, j-1)) * P1t + gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq2Int, j-1)) * P11t);
+      }
       gsl_matrix_set(L1, i, j, log(lambda) - log(mu) + log(gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq1Int, i-1))) + log(gsl_matrix_get(substModel, (int) gsl_vector_get(seq1Int, i-1), (int) gsl_vector_get(seq2Int, j-1)) * P1t + gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq2Int, j-1)) * P11t) + temp + log(exp(gsl_matrix_get(L0, i-1, j-1) - temp) + exp(gsl_matrix_get(L1, i-1, j-1) - temp) + exp(gsl_matrix_get(L2, i-1, j-1) - temp)));
+      if(i ==1 && j== 1){
+        Rprintf("L1 %f\n", gsl_matrix_get(L1, i, j-1));
+        Rprintf("L2 %f\n", gsl_matrix_get(L2, i, j-1));
+      }
+
       if(isfinite(gsl_matrix_get(L1, i, j-1)) || isfinite(gsl_matrix_get(L2, i, j-1))){
+        Rprintf("finite\n");
+        Rprintf("i is %d\n", i);
+        Rprintf("j is %d\n", j);
         temp = GSL_MAX(gsl_matrix_get(L1, i, j-1), gsl_matrix_get(L2, i,j-1));
+        if(i ==1 && j== 1){
+          Rprintf("temp is %f\n", temp);
+          Rprintf("first part is %f\n", log(gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq2Int, j-1))) + log(lambda) + lbeta);
+        }
         gsl_matrix_set(L2, i, j, log(gsl_vector_get(eqFrequencies, (int) gsl_vector_get(seq2Int, j-1))) + log(lambda) + lbeta + temp + log(exp(gsl_matrix_get(L1, i, j-1) - temp) + exp(gsl_matrix_get(L2, i, j-1) - temp)));
       }else{
         gsl_matrix_set(L2, i, j, -INFINITY);
