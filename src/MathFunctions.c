@@ -38,7 +38,7 @@ double log1x(double x){
 }
 
 /*********************************************************************
- * computes 1-exp(x), for very small x
+ * computes exp(x)-1, for very small x
  * expx1 := proc( x:numeric  )
  *   if |x| > 0.6931 then exp(x)-1
  * elif |x| > 0.0433217 then
