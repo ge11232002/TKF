@@ -5,8 +5,26 @@
 # Created Time: Tue Jul 29 20:48:49 2014
 #########################################################################
 
+### ------------------------------------------------------------------
+### CharacterSet
+### Not Exported!
 .AAOrder <- c("A","R","N","D","C","Q","E","G","H","I",
               "L","K","M","F","P","S","T","W","Y","V")
+AAGapCharacterSet <- c("A","R","N","D","C","Q","E","G","H","I",
+                        "L","K","M","F","P","S","T","W","Y","V", "-")
+AAGapCharacterSet <- .AAOrder
+AmbiguousAACharacterSet <- c("A","R","N","D","C","Q","E","G","H","I",
+                              "L","K","M","F","P","S","T","W","Y","V",
+                              "B","Z","J","X")
+AmbiguousAAGapCharacterSet <- c("A","R","N","D","C","Q","E","G","H","I",
+                                 "L","K","M","F","P","S","T","W","Y","V",
+                                 "B","Z","J","X", "-")
+DNACharacterSet <- c("A", "C", "G", "T")
+DNAGapCharacterSet <- c("A", "C", "G", "T", "-")
+RNACharacterSet <- c("A", "C", "G", "U")
+RNAGapCharacterSet <- c("A", "C", "G", "U", "-")
+
+
 
 .validatePAMMatrix <- function(PAM){
   ## First test whether it is a matrix
