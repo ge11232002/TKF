@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include<stdio.h>
+#include "MathFunctions.h"
 
 /*********************************************************************
  * Compute log(1+x), (the natural logarithm) for very small x.

@@ -6,6 +6,8 @@
  ************************************************************************/
 
 #include<stdio.h>
-
+#include <math.h>
+#include <stdlib.h>
 double log1x(double x);
-double exp1x(double x)
+double exp1x(double x);
+
