@@ -1,20 +1,38 @@
+gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c MathFunctions.c -o MathFunctions.o
 gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c matrix.c -o matrix.o
 gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF.c -o TKF.o
-gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so matrix.o  TKF.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-3.1.1/lib -lR -Wl,-framework -Wl,CoreFoundation
+gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o  TKF.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-3.1.1/lib -lR -Wl,-framework -Wl,CoreFoundation
 
+source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
 dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
-.Call("TKF91LikelihoodFunction1D", 250, GONNET)
 
-PAM250 <- PAMn(GONNET, 250)
+
+#PAM250 <- PAMn(GONNET, 250)
+
+## Read fasta
+library(seqinr)
+fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
+seq1 <- fasta[[1]]
+seq2 <- fasta[[2]]
+seq1Int = AAToInt(seq1)
+seq2Int = AAToInt(seq2)
+seq1Int <- seq1Int - 1L
+seq2Int <- seq2Int - 1L
+mu = 0.0013
+expectedLength = 362
+.Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET)
+
+
+
+
+
 
 
 temp = matrix(c(-1.0, 1.0, -1.0, 1.0, -8.0, 4.0, -2.0, 1.0, 27.0, 9.0, 3.0, 1.0, 64.0, 16.0, 4.0, 1.0), byrow=TRUE, ncol=4)
 temp = Hilbert(4)
 foo = eigen(temp, symmetric=FALSE)
 matrix(as.numeric(foo$vectors), ncol=20) %*% diag(log(as.numeric(foo$values)), 20,20) %*% ginv(matrix(as.numeric(foo$vectors), ncol=20))
-
-
 
 
 

@@ -12,7 +12,7 @@
               "L","K","M","F","P","S","T","W","Y","V")
 AAGapCharacterSet <- c("A","R","N","D","C","Q","E","G","H","I",
                         "L","K","M","F","P","S","T","W","Y","V", "-")
-AAGapCharacterSet <- .AAOrder
+AACharacterSet <- .AAOrder
 AmbiguousAACharacterSet <- c("A","R","N","D","C","Q","E","G","H","I",
                               "L","K","M","F","P","S","T","W","Y","V",
                               "B","Z","J","X")
@@ -24,7 +24,14 @@ DNAGapCharacterSet <- c("A", "C", "G", "T", "-")
 RNACharacterSet <- c("A", "C", "G", "U")
 RNAGapCharacterSet <- c("A", "C", "G", "U", "-")
 
-
+### ------------------------------------------------------------------
+### AA to Int index
+###
+AAToInt <- function(AA){
+  mapping <- 1:length(AACharacterSet)
+  names(mapping) <- AACharacterSet
+  return(mapping[AA])
+}
 
 .validatePAMMatrix <- function(PAM){
   ## First test whether it is a matrix
@@ -34,7 +41,7 @@ RNAGapCharacterSet <- c("A", "C", "G", "U", "-")
   if(nrow(PAM) != 20L || ncol(PAM) != 20L)
     stop("The input matrix must be a 20 * 20 square matrix")
   ## Third test the AA order.
-  if(!identical((rownames(PAM), .AAOrder)))
+  if(!identical(rownames(PAM), .AAOrder))
     stop("The row names are not identical with default AA order: ", .AAOrder)
   if(!identical(colnames(PAM), .AAOrder))
     stop("The column names are not identical with default AA order: ", .AAOrder)
