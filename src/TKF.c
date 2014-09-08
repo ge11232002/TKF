@@ -27,15 +27,12 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
-  Rprintf("hello\n");
+  //Rprintf("hello\n");
   gsl_matrix *substModel = p->substModel;
   gsl_vector *eqFrequencies = p->eqFrequencies;
   gsl_vector *seq1Int = p->seq1Int;
   gsl_vector *seq2Int = p->seq2Int;
-  for(int i = 0; i < seq1Int->size; i++){
-    Rprintf("%g \t", gsl_vector_get(seq1Int, i));
-  } 
-  Rprintf("hello2\n"); 
+  //Rprintf("hello2\n"); 
   double lambda = len / (len + 1) * mu;
   double alpha = -mu * distance;
   double lmt = exp((lambda-mu)*distance);
@@ -47,10 +44,10 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   double lP12t = log1x(-lambda * beta); 
   double lP01t = log(mu) + lbeta;
   double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
-  double P11tTest = (1.0 - exp(- mu * distance) - mu * beta) * (1.0 - lambda * beta);
+  //double P11tTest = (1.0 - exp(- mu * distance) - mu * beta) * (1.0 - lambda * beta);
   //Rprintf("P11t %f\n",P11t);
   //Rprintf("P11tTest %f\n",P11tTest);
-  Rprintf("hello3\n"); 
+  //Rprintf("hello3\n"); 
   // initialize the entries tables, only log-likelihood is stored in thie table
   int SA = seq1Int->size;
   int SB = seq2Int->size;
@@ -65,8 +62,6 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
 
   int i, j;
   double temp;
-  Rprintf("lp01 %f\n", lP01t);
-  Rprintf("fre %f\n", gsl_vector_get(eqFrequencies, 0));
   for(i = 1; i <= SA; i++){
     temp = 0;
     for(j = 1; j <= i; j++){
@@ -76,7 +71,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
     gsl_matrix_set(L1, i, 0, -INFINITY);
     gsl_matrix_set(L2, i, 0, -INFINITY);
   }
-  Rprintf("hello3.5\n");
+  //Rprintf("hello3.5\n");
   for(j = 1; j <= SB; j++){
     temp = 0;
     for( i = 1; i <= j; i++){
@@ -86,11 +81,8 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
     gsl_matrix_set(L1, 0, j, -INFINITY);
     gsl_matrix_set(L0, 0, j, -INFINITY);
   }
-  Rprintf("hello3.75\n");
-  printGSLMatrix(L0);
-  printGSLMatrix(L1);
-  printGSLMatrix(L2);
-  Rprintf("hello4\n");
+  //Rprintf("hello3.75\n");
+  //Rprintf("hello4\n");
   //recursive iteration
   for(i = 1; i <= SA; i++){
     for(j = 1; j <= SB; j++){
@@ -109,20 +101,17 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
       }
     }
   }
-  printGSLMatrix(L0);
-    printGSLMatrix(L1);
-      printGSLMatrix(L2);
-  Rprintf("hello5\n");
+  //Rprintf("hello5\n");
   temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, SA, SB), gsl_matrix_get(L1, SA, SB)), gsl_matrix_get(L2, SA, SB));
-  Rprintf("final temp %f\n", temp);
+  //Rprintf("final temp %f\n", temp);
   double likelihood;
   likelihood = -(temp + log(exp(gsl_matrix_get(L0, SA, SB) - temp) + exp(gsl_matrix_get(L1, SA, SB) - temp) + exp(gsl_matrix_get(L2, SA, SB) - temp)));
   // free the allocated matrix
   gsl_matrix_free(L0);
   gsl_matrix_free(L1);
   gsl_matrix_free(L2);
-  Rprintf("hello6\n");
-  Rprintf("\%f\n", likelihood);
+  //Rprintf("hello6\n");
+  //Rprintf("\%f\n", likelihood);
   return likelihood;
 }
 
@@ -157,9 +146,6 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP muR,
     gsl_vector_set(seq2IntGSL, i, INTEGER(seq2Int)[i]);
   }
 
-  for(i = 0; i < seq1IntGSL->size; i++){
-   printf ("v_%d = %g\n", i, gsl_vector_get (seq1IntGSL, i));
-  }
   // GSL minimizer 
   int status;
   int iter = 0, max_iter = 100;
