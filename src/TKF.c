@@ -27,7 +27,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
-  //Rprintf("hello\n");
+  Rprintf("Triger TKF91 distance %f\n", distance);
   gsl_matrix *substModel = p->substModel;
   gsl_vector *eqFrequencies = p->eqFrequencies;
   gsl_vector *seq1Int = p->seq1Int;
@@ -111,7 +111,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   gsl_matrix_free(L1);
   gsl_matrix_free(L2);
   //Rprintf("hello6\n");
-  //Rprintf("\%f\n", likelihood);
+  Rprintf("%f\n", likelihood);
   return likelihood;
 }
 
@@ -163,8 +163,8 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1Int, SEXP seq2Int, SEXP muR,
   params.seq2Int = seq2IntGSL;
   F.function = &TKF91LikelihoodFunction1D;
   F.params = &params;
-  double x_lo = 0.5, x_hi = 100000; 
-  double x = 2;
+  double x_lo = 0.5, x_hi = 200; 
+  double x = 116;
   double mEps = 0.001;
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
