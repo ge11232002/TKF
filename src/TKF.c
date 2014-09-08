@@ -27,12 +27,12 @@ struct TKF91LikelihoodFunction1D_params
 double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     double mu, double distance, gsl_matrix *substModel, 
     gsl_vector *eqFrequencies, int SA, int SB){
-  double lambda = len / (len + 1) * mu;
+  double lambda = len / (len + 1.0) * mu;
   double alpha = -mu * distance;
   double lmt = exp((lambda-mu)*distance);
   double lbeta = log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
   double beta = exp(lbeta); // beta is  not a very small number.
-  double P1t = exp(- mu * distance) * (1 - lambda * beta);
+  double P1t = exp(- mu * distance) * (1.0 - lambda * beta);
   double lP12t = log1x(-lambda * beta);
   double lP01t = log(mu) + lbeta;
   double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
@@ -164,9 +164,14 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   params.SB = GET_LENGTH(seq2IntR);
   F.function = &TKF91LikelihoodFunction1D;
   F.params = &params;
-  double x_lo = 0.5, x_hi = 100000; 
+  double x_lo = 2, x_hi = 100000; 
   double x = 100;
   double mEps = 0.001;
+
+  // set better region
+  //double mInitStepSize = 1;
+  //double factor = 2.0/(Sqrt(5.0)-1.0);
+
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
   gsl_min_fminimizer_set (s, &F, x, x_lo, x_hi);
