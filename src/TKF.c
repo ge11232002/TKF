@@ -49,18 +49,14 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   double temp;
   temp = 0;
   for(i = 1; i <= SA; i++){
-    //for(j = 1; j <= i; j++){
-      temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + lP01t;
-    //}
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + lP01t;
     gsl_matrix_set(L0, i, 0, log1x(-lambda/mu) + i * (log(lambda) - log(mu)) + lP12t + temp);
     gsl_matrix_set(L1, i, 0, -INFINITY);
     gsl_matrix_set(L2, i, 0, -INFINITY);
   }
   temp = 0;
   for(j = 1; j <= SB; j++){
-    //for( i = 1; i <= j; i++){
-      temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1]));
-    //}
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1]));
     gsl_matrix_set(L2, 0, j, log1x(-lambda/mu) + lP12t + j * (log(lambda) + lbeta) + temp);
     gsl_matrix_set(L1, 0, j, -INFINITY);
     gsl_matrix_set(L0, 0, j, -INFINITY);
