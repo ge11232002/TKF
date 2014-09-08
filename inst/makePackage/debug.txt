@@ -7,9 +7,6 @@ source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
 dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
-
-#PAM250 <- PAMn(GONNET, 250)
-
 ## Read fasta
 library(seqinr)
 fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
