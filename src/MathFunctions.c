@@ -7,7 +7,7 @@
 
 #include<stdio.h>
 #include "MathFunctions.h"
-
+#include "Rdefines.h"
 /*********************************************************************
  * Compute log(1+x), (the natural logarithm) for very small x.
  * The equivalent darwin code by Gaston Gonnet:
@@ -22,7 +22,7 @@
  *  end:
  * ******************************************************************/
 double log1x(double x){
-  double absX = abs(x);
+  double absX = fabs(x);
   if(absX > 0.125){
     return log(1+x);
   }else if(absX > 0.01){
@@ -50,7 +50,7 @@ double log1x(double x){
  * end:
  * ******************************************************************/
 double exp1x(double x){
-  double absX = abs(x);
+  double absX = fabs(x);
   if(absX < 0.0433217){
     return (1+(1+(1+(1+(1+(1+(1+x/8)*x/7)*x/6)*x/5)*x/4)*x/3)*x/2)*x;
   }else{
