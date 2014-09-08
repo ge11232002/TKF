@@ -12,19 +12,22 @@ dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
 ## Read fasta
 library(seqinr)
-fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair2.fasta" , seqtype="AA", set.attributes=FALSE)
+fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 seq1Int = AAToInt(seq1)
 seq2Int = AAToInt(seq2)
 seq1Int <- seq1Int - 1L
 seq2Int <- seq2Int - 1L
-mu = 0.0013
+mu = 5.920655e-04
 expectedLength = 362
 .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET, GONNETBF)
 
-
-
+mu = 0.0013
+len = 362
+distance = 2
+lambda = len / (len + 1) * mu
+log1p(-exp((lambda-mu)*distance)) - (log(mu) + log1p(-lambda/mu * exp((lambda-mu)*distance)))
 
 
 
