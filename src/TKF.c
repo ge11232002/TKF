@@ -160,13 +160,9 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   params.SB = GET_LENGTH(seq2IntR);
   F.function = &TKF91LikelihoodFunction1D;
   F.params = &params;
-  double x_lo = 2, x_hi = 100000; 
+  double x_lo = 0.0494497, x_hi = 2000; 
   double x = 100;
   double mEps = 0.001;
-
-  // set better region
-  //double mInitStepSize = 1;
-  //double factor = 2.0/(Sqrt(5.0)-1.0);
 
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
