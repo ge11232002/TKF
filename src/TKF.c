@@ -24,6 +24,15 @@ struct TKF91LikelihoodFunction1D_params
       int SA, SB;
 };
 
+struct TKF91LikelihoodFunction2D_params
+{
+  double len;
+  gsl_matrix *substModel;
+  gsl_vector *eqFrequencies;
+  int *seq1Int, *seq2Int;
+  int SA, SB;
+};
+
 double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     double mu, double distance, gsl_matrix *substModel, 
     gsl_vector *eqFrequencies, int SA, int SB){
@@ -96,7 +105,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
-  Rprintf("Triger TKF91 distance %f\n", distance);
+  //Rprintf("Triger TKF91 distance %f\n", distance);
   gsl_matrix *substModel = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
   PAMn(p->substModel, distance, substModel);
   gsl_vector *eqFrequencies = p->eqFrequencies;
@@ -112,6 +121,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   Rprintf("%f\n", likelihood);
   return likelihood;
 }
+
 
 SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
     SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
@@ -199,4 +209,59 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
 
   return R_NilValue;
 }
+
+SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
+    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
+  int ncol, nrow;
+  ncol = INTEGER(GET_DIM(probMatR))[1];
+  nrow = INTEGER(GET_DIM(probMatR))[0];
+  int i, j; 
+
+  // probMat
+  gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
+  for(i = 0; i < nrow; i++)
+    for(j = 0; j < ncol; j++)
+      gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
+
+  // eqFrequenciesR
+  gsl_vector *eqFrequencies = gsl_vector_alloc(GET_LENGTH(eqFrequenciesR));
+  for(i = 0; i < GET_LENGTH(eqFrequenciesR); i++){
+    gsl_vector_set(eqFrequencies, i, REAL(eqFrequenciesR)[i]);
+  }
+
+  // seqInt preparation
+  int *seq1Int, *seq2Int;
+  seq1Int = (int *) R_alloc(GET_LENGTH(seq1IntR), sizeof(int));
+  seq2Int = (int *) R_alloc(GET_LENGTH(seq2IntR), sizeof(int));
+  for(i = 0; i < GET_LENGTH(seq1IntR); i++){
+    seq1Int[i] = INTEGER(seq1IntR)[i];
+  }
+  for(i = 0; i < GET_LENGTH(seq2IntR); i++){
+    seq2Int[i] = INTEGER(seq2IntR)[i];
+  }
+  
+  // GSL minimizer 
+  int status;
+  int iter = 0, max_iter = 100;
+  const gsl_multimin_fminimizer_type *T;
+  gsl_multimin_fminimizer *s;
+  gsl_multimin_function F;
+  struct TKF91LikelihoodFunction2D_params params;
+  params.len = REAL(expectedLength)[0];
+  params.substModel = probMat;
+  params.eqFrequencies = eqFrequencies;
+  params.seq1Int = seq1Int;
+  params.seq2Int = seq2Int;
+  params.SA = GET_LENGTH(seq1IntR);
+  params.SB = GET_LENGTH(seq2IntR);
+  
+  // starting points
+  x = gsl_vector_alloc(2);
+  gsl_vector_set(x, 0, 100);
+  gsl_vector_set(x, 1, 0.001);
+
+  // Set initial step sizes 
+}
+
+
 
