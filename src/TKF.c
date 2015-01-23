@@ -10,6 +10,7 @@
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_math.h>
 #include<gsl/gsl_min.h>
+#include<gsl_multimin.h>
 #include "Rdefines.h"
 #include "matrix.h"
 #include "MathFunctions.h"
@@ -115,6 +116,28 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   int SB = p->SB;
   double likelihood;
   likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance, 
+      substModel, eqFrequencies, SA, SB);
+  // free the allocated matrix
+  gsl_matrix_free(substModel);
+  Rprintf("%f\n", likelihood);
+  return likelihood;
+}
+
+double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
+  double distance, mu;
+  struct TKF91LikelihoodFunction2D_params *p = struct (TKF91LikelihoodFunction2D_params *) params;
+  double len = p->len;
+  distance = gsl_vector_get(v, 0);
+  mu = gsl_vector_get(v, 1);
+  gsl_matrix *substModel = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
+  PAMn(p->substModel, distance, substModel);
+  gsl_vector *eqFrequencies = p->eqFrequencies;
+  int *seq1Int = p->seq1Int;
+  int *seq2Int = p->seq2Int;
+  int SA = p->SA;
+  int SB = p->SB;
+  double likelihood;
+  likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance,
       substModel, eqFrequencies, SA, SB);
   // free the allocated matrix
   gsl_matrix_free(substModel);
@@ -243,7 +266,8 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   // GSL minimizer 
   int status;
   int iter = 0, max_iter = 100;
-  const gsl_multimin_fminimizer_type *T;
+  const gsl_multimin_fminimizer_type *T = 
+    gsl_multimin_fminimizer_nmsimplex2;;
   gsl_multimin_fminimizer *s;
   gsl_multimin_function F;
   struct TKF91LikelihoodFunction2D_params params;
@@ -260,7 +284,50 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   gsl_vector_set(x, 0, 100);
   gsl_vector_set(x, 1, 0.001);
 
+  mAccuracy = 1e-3;
+  mInitStepSize = 1e-2;
   // Set initial step sizes 
+  ss = gsl_vector_alloc (2);
+  gsl_vector_set_all(ss, mInitStepSize);
+
+  // Initialize method and iterate
+  F.n = 2;
+  F.f = &TKF91LikelihoodFunction2D;
+  F.params = &params;
+
+  s = gsl_multimin_fminimizer_alloc(T, 2);
+  gsl_multimin_fminimizer_set (s, &F, x, ss);
+
+  printf("using %s method\n",
+      gsl_multimin_fminimizer_name (s));
+  printf("%5s [%9s, %9s] %9s %9s\n",
+      "iter", "minDistance", "minMu"
+      "err", "err(est)");
+  do
+  {
+    iter++;
+    status = gsl_multimin_fminimizer_iterate(s);
+    if(status){
+      break;
+    }
+    size = gsl_multimin_fminimizer_size(s);
+    status = gsl_multimin_test_size(size, mAccuracy);
+    if(status == GSL_SUCCESS){
+      printf("converged to minimu at \n");
+    }
+    printf("%5d %10.3e %10.3e f() = %7.3f size = %.3f\n",
+        iter,
+        gsl_vector_get(s->x, 0),
+        gsl_vector_get(s->x, 1),
+        s->fval, size
+        );
+  }
+  while(status == GSL_CONTINUE && iter < max_iter);
+  gsl_vector_free(x);
+  gsl_vector_free(ss);
+  gsl_multimin_fminimizer_free (s);
+
+  return status;
 }
 
 
