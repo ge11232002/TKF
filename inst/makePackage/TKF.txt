@@ -1,7 +1,7 @@
-gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c MathFunctions.c -o MathFunctions.o
-gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c matrix.c -o matrix.o
-gcc -I/Users/gtan/src/R-3.1.1/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF.c -o TKF.o
-gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o  TKF.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-3.1.1/lib -lR -Wl,-framework -Wl,CoreFoundation
+gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c MathFunctions.c -o MathFunctions.o
+gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c matrix.c -o matrix.o
+gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF.c -o TKF.o
+gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o  TKF.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
