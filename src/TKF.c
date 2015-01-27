@@ -145,6 +145,41 @@ double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
   return likelihood;
 }
 
+void TKF91LikelihoodFunction2D_df(const gsl_vector *v, void *params,
+    gsl_vector *df){
+  double mEps = 1e-4;
+  assert(gsl_vector_ispos(v));
+  gsl_vector *tempV = gsl_vector_alloc(2);
+  gsl_vector_memcpy(params, v);
+
+  double temp_dLikelihood;
+  // df/d_distance
+  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) + mEps/2;
+  temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
+  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) - mEps;
+  temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
+  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) + mEps/2;
+  temp_dLikelihood /= mEps;
+  gsl_vector_set(df, 0, temp_dLikelihood);
+
+  // df/d_mu
+  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) + mEps/2;
+  temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
+  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) - mEps;
+  temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
+  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) + mEps/2;
+  temp_dLikelihood /= mEps;
+  gsl_vector_set(df, 1, temp_dLikelihood);
+
+  gsl_vector_free(tempV);
+}
+
+void TKF91LikelihoodFunction2D_fdf(const gsl_vector *v, void *params,
+    double *f, gsl_vector *df){
+  *f = TKF91LikelihoodFunction2D(v, params);
+  TKF91LikelihoodFunction2D_df(v, params, df);
+}
+
 
 SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
     SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
@@ -266,8 +301,7 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   // GSL minimizer 
   int status;
   int iter = 0, max_iter = 100;
-  const gsl_multimin_fminimizer_type *T = 
-    gsl_multimin_fminimizer_nmsimplex2;;
+  const gsl_multimin_fminimizer_type *T;
   gsl_multimin_fminimizer *s;
   gsl_multimin_function F;
   struct TKF91LikelihoodFunction2D_params params;
@@ -293,10 +327,14 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   // Initialize method and iterate
   F.n = 2;
   F.f = &TKF91LikelihoodFunction2D;
+  F.df = &TKF91LikelihoodFunction2D_df;
+  F.fdf = &TKF91LikelihoodFunction2D_fdf;
   F.params = &params;
 
+  T = gsl_multimin_fdfminimizer_vector_bfgs2;
+  double accuracy = 0.1;
   s = gsl_multimin_fminimizer_alloc(T, 2);
-  gsl_multimin_fminimizer_set (s, &F, x, ss);
+  gsl_multimin_fminimizer_set (s, &F, x, ss, accuracy);
 
   printf("using %s method\n",
       gsl_multimin_fminimizer_name (s));
