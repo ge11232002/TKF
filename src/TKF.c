@@ -10,10 +10,11 @@
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_math.h>
 #include<gsl/gsl_min.h>
-#include<gsl_multimin.h>
+#include<gsl/gsl_multimin.h>
 #include "Rdefines.h"
 #include "matrix.h"
 #include "MathFunctions.h"
+#include <assert.h>
 
 
 struct TKF91LikelihoodFunction1D_params
@@ -125,7 +126,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
 
 double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
   double distance, mu;
-  struct TKF91LikelihoodFunction2D_params *p = struct (TKF91LikelihoodFunction2D_params *) params;
+  struct TKF91LikelihoodFunction2D_params *p = (struct TKF91LikelihoodFunction2D_params *) params;
   double len = p->len;
   distance = gsl_vector_get(v, 0);
   mu = gsl_vector_get(v, 1);
@@ -154,20 +155,20 @@ void TKF91LikelihoodFunction2D_df(const gsl_vector *v, void *params,
 
   double temp_dLikelihood;
   // df/d_distance
-  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) + mEps/2;
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + mEps/2);
   temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) - mEps;
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) - mEps);
   temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 0) = gsl_vector_get(tempV, 0) + mEps/2;
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + mEps/2);
   temp_dLikelihood /= mEps;
   gsl_vector_set(df, 0, temp_dLikelihood);
 
   // df/d_mu
-  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) + mEps/2;
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + mEps/2);
   temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) - mEps;
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) - mEps);
   temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 1) = gsl_vector_get(tempV, 1) + mEps/2;
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + mEps/2);
   temp_dLikelihood /= mEps;
   gsl_vector_set(df, 1, temp_dLikelihood);
 
@@ -301,9 +302,9 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   // GSL minimizer 
   int status;
   int iter = 0, max_iter = 100;
-  const gsl_multimin_fminimizer_type *T;
-  gsl_multimin_fminimizer *s;
-  gsl_multimin_function F;
+  const gsl_multimin_fdfminimizer_type *T = 0;
+  gsl_multimin_fdfminimizer *s;
+  gsl_multimin_function_fdf F;
   struct TKF91LikelihoodFunction2D_params params;
   params.len = REAL(expectedLength)[0];
   params.substModel = probMat;
@@ -314,15 +315,16 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   params.SB = GET_LENGTH(seq2IntR);
   
   // starting points
+  gsl_vector *x;
   x = gsl_vector_alloc(2);
   gsl_vector_set(x, 0, 100);
   gsl_vector_set(x, 1, 0.001);
 
-  mAccuracy = 1e-3;
-  mInitStepSize = 1e-2;
+  double mAccuracy = 1e-3;
+  double mInitStepSize = 1e-2;
   // Set initial step sizes 
-  ss = gsl_vector_alloc (2);
-  gsl_vector_set_all(ss, mInitStepSize);
+  //ss = gsl_vector_alloc (2);
+  //gsl_vector_set_all(ss, mInitStepSize);
 
   // Initialize method and iterate
   F.n = 2;
@@ -333,39 +335,35 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
 
   T = gsl_multimin_fdfminimizer_vector_bfgs2;
   double accuracy = 0.1;
-  s = gsl_multimin_fminimizer_alloc(T, 2);
-  gsl_multimin_fminimizer_set (s, &F, x, ss, accuracy);
+  s = gsl_multimin_fdfminimizer_alloc(T, 2);
+  gsl_multimin_fdfminimizer_set(s, &F, x, mInitStepSize, accuracy);
 
   printf("using %s method\n",
-      gsl_multimin_fminimizer_name (s));
-  printf("%5s [%9s, %9s] %9s %9s\n",
-      "iter", "minDistance", "minMu"
-      "err", "err(est)");
+      gsl_multimin_fdfminimizer_name(s));
   do
   {
     iter++;
-    status = gsl_multimin_fminimizer_iterate(s);
+    status = gsl_multimin_fdfminimizer_iterate(s);
     if(status){
       break;
     }
-    size = gsl_multimin_fminimizer_size(s);
-    status = gsl_multimin_test_size(size, mAccuracy);
+    status = gsl_multimin_test_gradient(s->gradient, mAccuracy);
     if(status == GSL_SUCCESS){
       printf("converged to minimu at \n");
     }
-    printf("%5d %10.3e %10.3e f() = %7.3f size = %.3f\n",
+    printf("%5d %.5f %.5f %10.5f\n",
         iter,
         gsl_vector_get(s->x, 0),
         gsl_vector_get(s->x, 1),
-        s->fval, size
+        s->f
         );
   }
   while(status == GSL_CONTINUE && iter < max_iter);
   gsl_vector_free(x);
-  gsl_vector_free(ss);
-  gsl_multimin_fminimizer_free (s);
+  //gsl_vector_free(ss);
+  gsl_multimin_fdfminimizer_free(s);
 
-  return status;
+  return R_NilValue;
 }
 
 
