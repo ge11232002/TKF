@@ -1,31 +1,4 @@
-#include<stdio.h>
-#include<gsl/gsl_matrix.h>
-#include<gsl/gsl_vector.h>
-#include<gsl/gsl_math.h>
-#include<gsl/gsl_min.h>
-#include<gsl/gsl_multimin.h>
-#include "Rdefines.h"
-#include "matrix.h"
-#include "MathFunctions.h"
-
-
-struct TKF91LikelihoodFunction1D_params
-{
-      double len, mu;
-      gsl_matrix *substModel;
-      gsl_vector *eqFrequencies;
-      int *seq1Int, *seq2Int;
-      int SA, SB;
-};
-
-struct TKF91LikelihoodFunction2D_params
-{
-  double len;
-  gsl_matrix *substModel;
-  gsl_vector *eqFrequencies;
-  int *seq1Int, *seq2Int;
-  int SA, SB;
-};
+#include "TKF.h"
 
 double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     double mu, double distance, gsl_matrix *substModel, 
