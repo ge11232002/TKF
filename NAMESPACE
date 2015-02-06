@@ -6,4 +6,12 @@ importFrom(expm, expm.Higham08, logm)
 ### -----------------------------------------------------------------
 ### Export non-generic functions
 ###
+  export(
+  ## ScoringMatrix.R
+  Dayhoffn, 
+  PAMn,
+  AAToInt,
+  AACharacterSet
+      )
+
 

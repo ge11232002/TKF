@@ -26,7 +26,7 @@ RNAGapCharacterSet <- c("A", "C", "G", "U", "-")
 
 ### ------------------------------------------------------------------
 ### AA to Int index
-###
+### Exported!
 AAToInt <- function(AA){
   mapping <- 1:length(AACharacterSet)
   names(mapping) <- AACharacterSet

@@ -106,7 +106,6 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
-  //Rprintf("Triger TKF91 distance %f\n", distance);
   gsl_matrix *substModel = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
   PAMn(p->substModel, distance, substModel);
   gsl_vector *eqFrequencies = p->eqFrequencies;
@@ -117,10 +116,65 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   double likelihood;
   likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance, 
       substModel, eqFrequencies, SA, SB);
+ 
   // free the allocated matrix
   gsl_matrix_free(substModel);
-  Rprintf("The 1D likelihood is %f\n", likelihood);
   return likelihood;
+}
+
+SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR, SEXP muR, SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
+  double len = REAL(expectedLength)[0];
+  double mu = REAL(muR)[0];
+  double distance = REAL(distanceR)[0];
+  // probMat
+  gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
+  for(i = 0; i < nrow; i++)
+    for(j = 0; j < ncol; j++)
+      gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
+  gsl_matrix *substModel = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
+  PAMn(probMat, distance, substModel);
+
+  // eqFrequenciesR
+  gsl_vector *eqFrequencies = gsl_vector_alloc(GET_LENGTH(eqFrequenciesR));
+  for(i = 0; i < GET_LENGTH(eqFrequenciesR); i++){
+    gsl_vector_set(eqFrequencies, i, REAL(eqFrequenciesR)[i]);
+  }
+
+  // seqInt preparation
+  int *seq1Int, *seq2Int;
+  seq1Int = (int *) R_alloc(GET_LENGTH(seq1IntR), sizeof(int));
+  seq2Int = (int *) R_alloc(GET_LENGTH(seq2IntR), sizeof(int));
+  for(i = 0; i < GET_LENGTH(seq1IntR); i++){
+    seq1Int[i] = INTEGER(seq1IntR)[i];
+  }
+  for(i = 0; i < GET_LENGTH(seq2IntR); i++){
+    seq2Int[i] = INTEGER(seq2IntR)[i];
+  }  
+  int SA = GET_LENGTH(seq1IntR);
+  int SB = GET_LENGTH(seq2IntR);
+  
+  double likelihood;
+  likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance,
+      substModel, eqFrequencies, SA, SB);
+
+  SEXP ans;
+  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(3));
+  REAL(ans)[0] = REAL(distanceR)[0];
+  REAL(ans)[1] = REAL(muR)[0];
+  REAL(ans)[2] = likelihood;
+  SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
+  SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
+  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_NAMES(ans, ansNames);
+
+  // free the allocated matrix
+  gsl_matrix_free(substModel);
+  gsl_matrix_free(probMat);
+  gsl_matrix_free(eqFrequencies);
+  
+  UNPROTECT(2);
+  return ans;
 }
 
 double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
@@ -271,13 +325,25 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
               x, x_hi - x_lo);
     }
   while (status == GSL_CONTINUE && iter < max_iter);
+ 
+  SEXP ans;
+  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(3));
+  REAL(ans)[0] = x;
+  REAL(ans)[1] = REAL(muR)[0];
+  REAL(ans)[2] = gsl_min_fminimizer_f_minimum(s); 
+  SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
+  SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
+  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_NAMES(ans, ansNames);
   
   // free the allocation
   gsl_matrix_free(probMat);
   gsl_min_fminimizer_free (s);
   gsl_vector_free(eqFrequencies);
 
-  return R_NilValue;
+  UNPROTECT(2);
+  return ans;
 }
 
 SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
