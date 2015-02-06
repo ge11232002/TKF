@@ -14,7 +14,6 @@
 #include "Rdefines.h"
 #include "matrix.h"
 #include "MathFunctions.h"
-#include <assert.h>
 
 
 struct TKF91LikelihoodFunction1D_params
@@ -126,7 +125,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
 }
 
 double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
-  assert(gsl_vector_ispos(v));
+  Rprintf("Check the v %d\n", gsl_vector_ispos(v));
   double distance, mu;
   struct TKF91LikelihoodFunction2D_params *p = (struct TKF91LikelihoodFunction2D_params *) params;
   double len = p->len;
@@ -140,43 +139,50 @@ double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
   int SA = p->SA;
   int SB = p->SB;
   double likelihood;
-  Rprintf("the distance is %f\n", distance);
-  Rprintf("the mu is %f\n", mu);
   likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance,
       substModel, eqFrequencies, SA, SB);
   // free the allocated matrix
   gsl_matrix_free(substModel);
-  Rprintf("The 2D likelihood is %f\n", likelihood);
+  Rprintf("The mu, distance and 2D likelihood is \n");
+  Rprintf("%f\t%f\t%f\n", mu, distance, likelihood);
   return likelihood;
 }
 
 void TKF91LikelihoodFunction2D_df(const gsl_vector *v, void *params,
     gsl_vector *df){
-  double mEps = 1e-4;
-  assert(gsl_vector_ispos(v));
+  Rprintf("numerical df\n");
+  gsl_vector *mEps = gsl_vector_alloc(2);
+  gsl_vector_set(mEps, 0, 0.1);  // from Tools/aligner.cpp, tkf2d.setEps(Vector2d(0.1,0.01));
+  gsl_vector_set(mEps, 1, 0.01); // from Tools/aligner.cpp
+  //double mEps = 1e-4;
   gsl_vector *tempV = gsl_vector_alloc(2);
   gsl_vector_memcpy(tempV, v);
 
   double temp_dLikelihood;
   // df/d_distance
-  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + mEps/2);
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + 
+      gsl_vector_get(mEps, 0)/2);
   temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) - mEps);
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) - gsl_vector_get(mEps, 0));
   temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + mEps/2);
-  temp_dLikelihood /= mEps;
+  gsl_vector_set(tempV, 0, gsl_vector_get(tempV, 0) + 
+    gsl_vector_get(mEps, 0)/2);
+  temp_dLikelihood /= gsl_vector_get(mEps, 0);
   gsl_vector_set(df, 0, temp_dLikelihood);
 
   // df/d_mu
-  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + mEps/2);
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + 
+    gsl_vector_get(mEps, 1)/2);
   temp_dLikelihood = TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) - mEps);
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) - gsl_vector_get(mEps, 1));
   temp_dLikelihood -= TKF91LikelihoodFunction2D(tempV, params);
-  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + mEps/2);
-  temp_dLikelihood /= mEps;
+  gsl_vector_set(tempV, 1, gsl_vector_get(tempV, 1) + 
+    gsl_vector_get(mEps, 1)/2);
+  temp_dLikelihood /= gsl_vector_get(mEps, 1);
   gsl_vector_set(df, 1, temp_dLikelihood);
 
   gsl_vector_free(tempV);
+  gsl_vector_free(mEps);
 }
 
 void TKF91LikelihoodFunction2D_fdf(const gsl_vector *v, void *params,
@@ -305,7 +311,7 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   
   // GSL minimizer 
   int status;
-  int iter = 0, max_iter = 200;
+  int iter = 0, max_iter = 200; // from Tools/aligner.cpp, optim2D.setMaxIterations(200);
   const gsl_multimin_fdfminimizer_type *T = 0;
   gsl_multimin_fdfminimizer *s;
   gsl_multimin_function_fdf F;
@@ -321,11 +327,11 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   // starting points
   gsl_vector *x;
   x = gsl_vector_alloc(2);
-  gsl_vector_set(x, 0, 100);
-  gsl_vector_set(x, 1, 5.920655e-04);
+  gsl_vector_set(x, 0, 100); // distance, from Tools/aligner.cpp,  Vector2d(-3.0, 2.0); in Exp scale.
+  gsl_vector_set(x, 1, exp(-3)); // mu, same
 
-  double mAccuracy = 1e-3;
-  double mInitStepSize = 1e-2;
+  double mAccuracy = 1e-3; // from Tools/aligner.cpp, optim2D.setAccuracy(1e-3);
+  double mInitStepSize = 0.85; // from Tools/aligner.cpp, optim2D.setInitialStepSize(0.85);
   // Set initial step sizes 
   //ss = gsl_vector_alloc (2);
   //gsl_vector_set_all(ss, mInitStepSize);
@@ -350,11 +356,12 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
     Rprintf("Iteration: %d", iter);
     status = gsl_multimin_fdfminimizer_iterate(s);
     if(status){
+      Rprintf("The status code: %d\n", status);
       break;
     }
-    Rprintf("I am here!");
+    Rprintf("I am here!\n");
     status = gsl_multimin_test_gradient(s->gradient, mAccuracy);
-    Rprintf("I am here2!");
+    Rprintf("I am here2!\n");
     if(status == GSL_SUCCESS){
       printf("converged to minimu at \n");
     }
