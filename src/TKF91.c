@@ -271,9 +271,9 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   s = gsl_min_fminimizer_alloc (T);
   gsl_min_fminimizer_set (s, &F, x, x_lo, x_hi);
   
-  printf("using %s method\n", 
+  Rprintf("using %s method\n", 
       gsl_min_fminimizer_name (s));
-  printf("%5s [%9s, %9s] %9s %10s %9s\n",
+  Rprintf("%5s [%9s, %9s] %9s %10s %9s\n",
       "iter", "lower", "upper", "min", 
       "err", "err(est)");
   
@@ -287,8 +287,8 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
       status = gsl_min_test_interval(x_lo, x_hi,
                                      mEps*mEps, mEps);
       if (status == GSL_SUCCESS)
-        printf ("Converged:\n");
-      printf ("%5d [%.7f, %.7f] "
+        Rprintf ("Converged:\n");
+      Rprintf ("%5d [%.7f, %.7f] "
               "%.7f %.7f\n",
               iter, x_lo,  x_hi,
               x, x_hi - x_lo);
@@ -383,7 +383,7 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   s = gsl_multimin_fdfminimizer_alloc(T, 2);
   gsl_multimin_fdfminimizer_set(s, &F, x, mInitStepSize, accuracy);
 
-  printf("using %s method\n",
+  Rprintf("using %s method\n",
       gsl_multimin_fdfminimizer_name(s));
   do
   {
@@ -395,9 +395,9 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
     }
     status = gsl_multimin_test_gradient(s->gradient, mAccuracy);
     if(status == GSL_SUCCESS){
-      printf("converged to minimu at \n");
+      Rprintf("converged to minimu at \n");
     }
-    printf("%5d %.5f %.5f %10.5f\n",
+    Rprintf("%5d %.5f %.5f %10.5f\n",
         iter,
         gsl_vector_get(s->x, 0),
         gsl_vector_get(s->x, 1),
@@ -479,7 +479,7 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   s = gsl_multimin_fminimizer_alloc(T, 2);
   gsl_multimin_fminimizer_set(s, &F, x, ss);
 
-  printf("using %s method\n",
+  Rprintf("using %s method\n",
       gsl_multimin_fminimizer_name(s));
   do
   {
@@ -492,9 +492,9 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
     size = gsl_multimin_fminimizer_size(s);
     status = gsl_multimin_test_size (size, 1e-5);
     if(status == GSL_SUCCESS){
-      printf("converged to minimu at \n");
+      Rprintf("converged to minimu at \n");
     }
-    printf("%5d %10.3e %10.3e f() = %7.3f size = %.5f\n", 
+    Rprintf("%5d %10.3e %10.3e f() = %7.3f size = %.5f\n", 
         iter,
         gsl_vector_get (s->x, 0), 
         gsl_vector_get (s->x, 1), 
