@@ -3,6 +3,9 @@ gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-conf
 gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF91.c -o TKF91.o
 gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF91.so MathFunctions.o  matrix.o  TKF91.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
+
+R CMD BUILD  TKF
+R CMD INSTALL TKF_0.0.1.tar.gz
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF91.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")

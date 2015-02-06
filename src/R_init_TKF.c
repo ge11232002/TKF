@@ -4,9 +4,9 @@
 
 static const R_CallMethodDef callMethods[] = {
   /* TKF91.c */
-  CALLMETHOD_DEF(SEXP TKF91LikelihoodFunctionWrapper, 7),
-  CALLMETHOD_DEF(SEXP TKF91LikelihoodFunction1DMain, 6),
-  CALLMETHOD_DEF(SEXP TKF91LikelihoodFunction2DMainNM, 5),
+  CALLMETHOD_DEF(TKF91LikelihoodFunctionWrapper, 7),
+  CALLMETHOD_DEF(TKF91LikelihoodFunction1DMain, 6),
+  CALLMETHOD_DEF(TKF91LikelihoodFunction2DMainNM, 5),
 
   /* TKF92.c */
 
