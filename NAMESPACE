@@ -14,9 +14,6 @@ export(
   AAToInt,
   AACharacterSet,
 
-  ## Lazy data
-  GONNET, GONNETBF,
-
   ## TKF91.R
   TKF91Pair, TKF91
   )
