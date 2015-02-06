@@ -1,4 +1,4 @@
-#include "TKF.h"
+#include "TKF91.h"
 
 double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     double mu, double distance, gsl_matrix *substModel, 
