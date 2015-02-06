@@ -85,7 +85,6 @@ AAToInt <- function(AA){
 ### Exported!
 PAMn <- function(PAM1, n){
   ## Validated by Darwin
-  require(expm)
   .validatePAMMatrix(PAM1)
   ans <- expm.Higham08(n * logm(PAM1))
   dimnames(ans) <- dimnames(PAM1)
@@ -103,7 +102,6 @@ PAMn <- function(PAM1, n){
 ### Exported!
 Dayhoffn <- function(PAM1, BF, n){
   ## Verified by Darwin
-  require(expm)
   .validatePAMMatrix(PAM1)
   .validateBF(BF)
   pamn <- PAMn(PAM1, n)
