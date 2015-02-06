@@ -51,6 +51,7 @@ Dayhoff, M.O., and Schwartz, R.M. (1978). A model of evolutionary change in prot
 }
 
 \examples{
+  library(TKF)
   ## PAM 250 mutation matrix
   PAM250 <- PAMn(GONNET, 250)
   

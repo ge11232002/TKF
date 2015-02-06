@@ -11,7 +11,7 @@
 }
 \usage{
 TKF91(fasta, mu=NULL, expectedLength=362, 
-      substModel=GONNET, substModelBF=GONNETBF)
+      substModel, substModelBF)
 TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
           expectedLength=362, substModel, substModelBF)
 }
@@ -28,6 +28,10 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
     When it is NULL, a joint estimation of \code{mu} and \code{distance} will
     be done.
     When it is given, only the distance will be estimated.
+  }
+  \item{distance}{
+    A \link{numeric} value: the PAM distance between two protein sequences.
+    When it is given, TKF91Pair only calculates the negative log-likelihood.
   }
   \item{expectedLength}{
     A \link{numeric} object: the expected length of input protein sequences.
@@ -62,7 +66,7 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
 \references{
 Thorne, J.L., Kishino, H., and Felsenstein, J. (1991). An evolutionary model for maximum likelihood alignment of DNA sequences. J. Mol. Evol. 33, 114-124.
 
-Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the entire protein sequence database. Science 256, 1443–1445.
+Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the entire protein sequence database. Science 256, 1443-1445.
 }
 \author{
   Ge Tan
