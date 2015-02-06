@@ -14,8 +14,7 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h> 
 #include "matrix.h"
-#include "TKF.h" // for Eps
-#include <assert.h> // for assert
+#include "assert.h"
 
 /*********************************************************************
  * Print a GSL matrix in a proper shape

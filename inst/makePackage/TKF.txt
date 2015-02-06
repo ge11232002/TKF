@@ -16,6 +16,7 @@ seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 ## 1D
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
+TKF91(fasta, mu=5.920655e-04)
 ## 2D
 TKF91Pair(seq1, seq2, substModel=GONNET, substModelBF=GONNETBF)
 TKF91(fasta)
