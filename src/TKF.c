@@ -103,7 +103,6 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
 
 
 double TKF91LikelihoodFunction1D(double distance, void *params){
-  assert(distance > 0);
   struct TKF91LikelihoodFunction1D_params *p = (struct TKF91LikelihoodFunction1D_params *) params;
   double len = p->len;
   double mu = p->mu;
@@ -125,7 +124,9 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
 }
 
 double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
-  Rprintf("Check the v %d\n", gsl_vector_ispos(v));
+  if(gsl_vector_ispos(v) != 1){
+    return GSL_POSINF;
+  }
   double distance, mu;
   struct TKF91LikelihoodFunction2D_params *p = (struct TKF91LikelihoodFunction2D_params *) params;
   double len = p->len;
@@ -150,7 +151,7 @@ double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
 
 void TKF91LikelihoodFunction2D_df(const gsl_vector *v, void *params,
     gsl_vector *df){
-  Rprintf("numerical df\n");
+  Rprintf("run numerical df\n");
   gsl_vector *mEps = gsl_vector_alloc(2);
   gsl_vector_set(mEps, 0, 0.1);  // from Tools/aligner.cpp, tkf2d.setEps(Vector2d(0.1,0.01));
   gsl_vector_set(mEps, 1, 0.01); // from Tools/aligner.cpp
@@ -331,7 +332,7 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   gsl_vector_set(x, 1, exp(-3)); // mu, same
 
   double mAccuracy = 1e-3; // from Tools/aligner.cpp, optim2D.setAccuracy(1e-3);
-  double mInitStepSize = 0.85; // from Tools/aligner.cpp, optim2D.setInitialStepSize(0.85);
+  double mInitStepSize = 0.01; // from Tools/aligner.cpp, optim2D.setInitialStepSize(0.85);
   // Set initial step sizes 
   //ss = gsl_vector_alloc (2);
   //gsl_vector_set_all(ss, mInitStepSize);
@@ -342,10 +343,10 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   F.df = &TKF91LikelihoodFunction2D_df;
   F.fdf = &TKF91LikelihoodFunction2D_fdf;
   F.params = &params;
-
   T = gsl_multimin_fdfminimizer_vector_bfgs2;
   double accuracy = 0.1;
   s = gsl_multimin_fdfminimizer_alloc(T, 2);
+  Rprintf("I am here1!\n");
   gsl_multimin_fdfminimizer_set(s, &F, x, mInitStepSize, accuracy);
 
   printf("using %s method\n",
@@ -353,15 +354,13 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   do
   {
     iter++;
-    Rprintf("Iteration: %d", iter);
+    Rprintf("Iteration: %d\n", iter);
     status = gsl_multimin_fdfminimizer_iterate(s);
     if(status){
       Rprintf("The status code: %d\n", status);
       break;
     }
-    Rprintf("I am here!\n");
     status = gsl_multimin_test_gradient(s->gradient, mAccuracy);
-    Rprintf("I am here2!\n");
     if(status == GSL_SUCCESS){
       printf("converged to minimu at \n");
     }
