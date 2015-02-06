@@ -26,7 +26,10 @@ TKF91 <- function(seq1, seq2, mu=NULL, distance=NULL,
                  expectedLength, substModel, substModelBF)
   }else if(!is.null(mu) && !is.null(distance)){
     ## Just calculate the likelihood, given mu and distance
-
+    ans <- .Call("TKF91LikelihoodFunction1DWrapper", seq1Int, seq2Int, 
+                 distance, mu, expectedLength, substModel, substModelBF)
+  }else{
+    stop("You cannot estimate mu alone!")
   }
-
+  return(ans)
 }

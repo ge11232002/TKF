@@ -126,12 +126,16 @@ SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanc
   double len = REAL(expectedLength)[0];
   double mu = REAL(muR)[0];
   double distance = REAL(distanceR)[0];
+  int ncol, nrow;
+  ncol = INTEGER(GET_DIM(probMatR))[1];
+  nrow = INTEGER(GET_DIM(probMatR))[0];
+  int i, j;
   // probMat
   gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
   for(i = 0; i < nrow; i++)
     for(j = 0; j < ncol; j++)
       gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
-  gsl_matrix *substModel = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
+  gsl_matrix *substModel = gsl_matrix_alloc(probMat->size1, probMat->size2);
   PAMn(probMat, distance, substModel);
 
   // eqFrequenciesR
@@ -157,7 +161,7 @@ SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanc
   likelihood = TKF91LikelihoodFunction(seq1Int, seq2Int, len, mu, distance,
       substModel, eqFrequencies, SA, SB);
 
-  SEXP ans;
+  SEXP ans, ansNames;
   PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
   PROTECT(ansNames = NEW_CHARACTER(3));
   REAL(ans)[0] = REAL(distanceR)[0];
@@ -171,7 +175,7 @@ SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanc
   // free the allocated matrix
   gsl_matrix_free(substModel);
   gsl_matrix_free(probMat);
-  gsl_matrix_free(eqFrequencies);
+  gsl_vector_free(eqFrequencies);
   
   UNPROTECT(2);
   return ans;
@@ -326,7 +330,7 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
     }
   while (status == GSL_CONTINUE && iter < max_iter);
  
-  SEXP ans;
+  SEXP ans, ansNames;
   PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
   PROTECT(ansNames = NEW_CHARACTER(3));
   REAL(ans)[0] = x;

@@ -4,6 +4,7 @@ gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-conf
 gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o  TKF.o  -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
+source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF91.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
 dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
@@ -12,16 +13,13 @@ library(seqinr)
 fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
-seq1Int = AAToInt(seq1)
-seq2Int = AAToInt(seq2)
-seq1Int <- seq1Int - 1L
-seq2Int <- seq2Int - 1L
-mu = 5.920655e-04
-expectedLength = 362
-.Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET, GONNETBF)
-dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
-.Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int, expectedLength , GONNET, GONNETBF)
-.Call("TKF91LikelihoodFunction2DMain", seq1Int, seq2Int, expectedLength , GONNET, GONNETBF)
+## 1D
+TKF91(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
+## pure likelihood
+TKF91(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
+
+
+
 
 mu = 0.0013
 len = 362
