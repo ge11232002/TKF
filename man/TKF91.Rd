@@ -42,7 +42,7 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
     to another AA at PAM distance 1. 
     The order of AA in the matrix should be identical to \link{AACharacterSet}.
   }
-  \item{subsetModelBF}{
+  \item{substModelBF}{
     A vector of \link{numeric}: the backrgound frequency of AAs.
     The order of AA in the vector should also be identical to 
     \link{AACharacterSet}.
@@ -78,6 +78,8 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   \code{\link{GONNET}}, \code{\link{GONNETBF}}
 }
 \examples{
+  data(GONNET)
+  data(GONNETBF)
   library(seqinr)
   fasta <- read.fasta(file.path(system.file("extdata", package="TKF"),
                       "pair1.fasta"),

@@ -1,6 +1,7 @@
 \name{GONNET}
 \alias{GONNET}
 \alias{GONNETBF}
+
 \docType{data}
 \title{
   The GONNET AA matrix
@@ -9,8 +10,8 @@
   The GONNET mutation matrix and background frequency.
 }
 \usage{
-data("GONNET")
-data("GONNETBF")
+data(GONNET)
+data(GONNETBF)
 }
 \format{
   A 20*20 numeric matrix.
