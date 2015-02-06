@@ -412,7 +412,7 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   // GSL minimizer 
   int status;
   double size;
-  int iter = 0, max_iter = 500; 
+  int iter = 0, max_iter = 1000; 
   const gsl_multimin_fminimizer_type *T = 0;
   gsl_multimin_fminimizer *s;
   gsl_multimin_function F;
@@ -459,11 +459,11 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
       break;
     }
     size = gsl_multimin_fminimizer_size(s);
-    status = gsl_multimin_test_size (size, 1e-4);
+    status = gsl_multimin_test_size (size, 1e-5);
     if(status == GSL_SUCCESS){
       printf("converged to minimu at \n");
     }
-    printf("%5d %10.3e %10.3e f() = %7.3f size = %.3f\n", 
+    printf("%5d %10.3e %10.3e f() = %7.3f size = %.5f\n", 
         iter,
         gsl_vector_get (s->x, 0), 
         gsl_vector_get (s->x, 1), 
