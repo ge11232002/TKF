@@ -379,5 +379,102 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   return R_NilValue;
 }
 
+SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
+    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
+  int ncol, nrow;
+  ncol = INTEGER(GET_DIM(probMatR))[1];
+  nrow = INTEGER(GET_DIM(probMatR))[0];
+  int i, j; 
+
+  // probMat
+  gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol);
+  for(i = 0; i < nrow; i++)
+    for(j = 0; j < ncol; j++)
+      gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
+
+  // eqFrequenciesR
+  gsl_vector *eqFrequencies = gsl_vector_alloc(GET_LENGTH(eqFrequenciesR));
+  for(i = 0; i < GET_LENGTH(eqFrequenciesR); i++){
+    gsl_vector_set(eqFrequencies, i, REAL(eqFrequenciesR)[i]);
+  }
+
+  // seqInt preparation
+  int *seq1Int, *seq2Int;
+  seq1Int = (int *) R_alloc(GET_LENGTH(seq1IntR), sizeof(int));
+  seq2Int = (int *) R_alloc(GET_LENGTH(seq2IntR), sizeof(int));
+  for(i = 0; i < GET_LENGTH(seq1IntR); i++){
+    seq1Int[i] = INTEGER(seq1IntR)[i];
+  }
+  for(i = 0; i < GET_LENGTH(seq2IntR); i++){
+    seq2Int[i] = INTEGER(seq2IntR)[i];
+  }
+  
+  // GSL minimizer 
+  int status;
+  double size;
+  int iter = 0, max_iter = 500; 
+  const gsl_multimin_fminimizer_type *T = 0;
+  gsl_multimin_fminimizer *s;
+  gsl_multimin_function F;
+  struct TKF91LikelihoodFunction2D_params params;
+  params.len = REAL(expectedLength)[0];
+  params.substModel = probMat;
+  params.eqFrequencies = eqFrequencies;
+  params.seq1Int = seq1Int;
+  params.seq2Int = seq2Int;
+  params.SA = GET_LENGTH(seq1IntR);
+  params.SB = GET_LENGTH(seq2IntR);
+  
+  // starting points
+  gsl_vector *x;
+  x = gsl_vector_alloc(2);
+  gsl_vector_set(x, 0, 100); // distance, from Tools/aligner.cpp,  Vector2d(-3.0, 2.0); in Exp scale.
+  gsl_vector_set(x, 1, exp(-3)); // mu, same
+
+  // Set initial step sizes 
+  gsl_vector *ss;
+  ss = gsl_vector_alloc(2);
+  gsl_vector_set(ss, 0, 0.01);
+  gsl_vector_set(ss, 1, 1);
+
+  // Initialize method and iterate
+  F.n = 2;
+  F.f = &TKF91LikelihoodFunction2D;
+  F.params = &params;
+  T = gsl_multimin_fminimizer_nmsimplex2;
+  double accuracy = 0.1;
+  s = gsl_multimin_fminimizer_alloc(T, 2);
+  Rprintf("I am here1!\n");
+  gsl_multimin_fminimizer_set(s, &F, x, ss);
+
+  printf("using %s method\n",
+      gsl_multimin_fminimizer_name(s));
+  do
+  {
+    iter++;
+    Rprintf("Iteration: %d\n", iter);
+    status = gsl_multimin_fminimizer_iterate(s);
+    if(status){
+      Rprintf("The status code: %d\n", status);
+      break;
+    }
+    size = gsl_multimin_fminimizer_size(s);
+    status = gsl_multimin_test_size (size, 1e-4);
+    if(status == GSL_SUCCESS){
+      printf("converged to minimu at \n");
+    }
+    printf("%5d %10.3e %10.3e f() = %7.3f size = %.3f\n", 
+        iter,
+        gsl_vector_get (s->x, 0), 
+        gsl_vector_get (s->x, 1), 
+        s->fval, size);
+  }
+  while(status == GSL_CONTINUE && iter < max_iter);
+  gsl_vector_free(x);
+  gsl_vector_free(ss);
+  gsl_multimin_fminimizer_free(s);
+
+  return R_NilValue;
+}
 
 

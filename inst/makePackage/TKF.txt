@@ -20,6 +20,7 @@ mu = 5.920655e-04
 expectedLength = 362
 .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu, expectedLength , GONNET, GONNETBF)
 dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
+.Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int, expectedLength , GONNET, GONNETBF)
 .Call("TKF91LikelihoodFunction2DMain", seq1Int, seq2Int, expectedLength , GONNET, GONNETBF)
 
 mu = 0.0013
