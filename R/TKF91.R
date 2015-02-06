@@ -19,7 +19,9 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance)){ 
     ## Do the 2D optimisation
-
+    ans <- .Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int,
+                 expectedLength, substModel, substModelBF)
+    return(ans)
   }else if(!is.null(mu) && is.null(distance)){
     ## Do the 1D distance optimisation
     ans <- .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu,

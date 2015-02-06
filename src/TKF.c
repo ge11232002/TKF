@@ -122,7 +122,7 @@ double TKF91LikelihoodFunction1D(double distance, void *params){
   return likelihood;
 }
 
-SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR, SEXP muR, SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
+SEXP TKF91LikelihoodFunctionWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR, SEXP muR, SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
   double len = REAL(expectedLength)[0];
   double mu = REAL(muR)[0];
   double distance = REAL(distanceR)[0];
@@ -540,10 +540,24 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
         s->fval, size);
   }
   while(status == GSL_CONTINUE && iter < max_iter);
+
+  SEXP ans, ansNames;
+  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(3));
+  REAL(ans)[0] = gsl_vector_get (s->x, 0);
+  REAL(ans)[1] = gsl_vector_get (s->x, 1);
+  REAL(ans)[2] = s->fval;
+  SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
+  SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
+  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_NAMES(ans, ansNames);
+
+  // free everything
   gsl_vector_free(x);
   gsl_vector_free(ss);
   gsl_multimin_fminimizer_free(s);
 
+  UNPROTECT(2);
   return R_NilValue;
 }
 

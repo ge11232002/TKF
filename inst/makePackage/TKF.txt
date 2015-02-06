@@ -16,6 +16,8 @@ seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 ## 1D
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
+## 2D
+TKF91Pair(seq1, seq2, substModel=GONNET, substModelBF=GONNETBF)
 ## pure likelihood
 TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
 
