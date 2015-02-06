@@ -6,6 +6,7 @@ Description: Distance estimation with TKF 91 and TKF 92 model.
 Author: Ge Tan <ge.tan09@imperial.ac.uk> 
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>
 Imports: methods
+Suggests: seqinr
 Depends: R (>= 3.0.2)
 Suggests: RUnit
 System Requirements: gsl

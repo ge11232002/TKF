@@ -7,12 +7,18 @@ importFrom(numDeriv, hessian)
 ### -----------------------------------------------------------------
 ### Export non-generic functions
 ###
-  export(
+export(
   ## ScoringMatrix.R
   Dayhoffn, 
   PAMn,
   AAToInt,
-  AACharacterSet
-      )
+  AACharacterSet,
+
+  ## Lazy data
+  GONNET, GONNETBF,
+
+  ## TKF91.R
+  TKF91Pair, TKF91
+  )
 
 
