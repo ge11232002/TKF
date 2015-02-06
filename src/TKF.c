@@ -153,7 +153,7 @@ SEXP TKF91LikelihoodFunction1DWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanc
   }
   for(i = 0; i < GET_LENGTH(seq2IntR); i++){
     seq2Int[i] = INTEGER(seq2IntR)[i];
-  }  
+  }
   int SA = GET_LENGTH(seq1IntR);
   int SB = GET_LENGTH(seq2IntR);
   

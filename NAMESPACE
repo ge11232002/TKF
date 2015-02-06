@@ -2,6 +2,7 @@ useDynLib(TKF, .registration = TRUE)
 
 ### Import ordinary functions from other packages
 importFrom(expm, expm.Higham08, logm)
+importFrom(numDeriv, hessian)
 
 ### -----------------------------------------------------------------
 ### Export non-generic functions

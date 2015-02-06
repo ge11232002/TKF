@@ -10,13 +10,14 @@ dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
 ## Read fasta
 library(seqinr)
+library(numDeriv)
 fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 ## 1D
-TKF91(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
+TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 ## pure likelihood
-TKF91(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
+TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
 
 
 
