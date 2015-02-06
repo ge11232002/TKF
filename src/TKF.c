@@ -1,10 +1,3 @@
-/*************************************************************************
-    > File Name: TKF.c
-    > Author: Ge Tan
-    > Mail: gtan@me.com 
-    > Created Time: Wed Jul 30 17:55:28 2014
- ************************************************************************/
-
 #include<stdio.h>
 #include<gsl/gsl_matrix.h>
 #include<gsl/gsl_vector.h>
