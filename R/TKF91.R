@@ -64,4 +64,30 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
 }
 
 
+TKF91 <- function(fasta, mu=NULL, expectedLength=362, 
+                  substModel=GONNET, substModelBF=GONNETBF){
+  seqnames <- names(fasta)
+  nSeqs <- length(fasta)
+  distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
+                           dimnames=list(seqnames, seqnames))
+  varianceMatrix <- distanceMatrix
+  negLoglikelihoodMatrix <- distanceMatrix  
+  for(i in 1:(nSeqs-1L)){
+    for(j in (i+1L):nSeqs){
+      message(seqnames[i], " vs ", seqnames[j])
+      ans <- TKF91Pair(fasta[[i]], fasta[[2]], 
+                       mu=mu, expectedLength=expectedLength,
+                       substModel=substModel, substModelBF=substModelBF)
+      distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
+      varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
+      negLoglikelihoodMatrix[i,j] <- negLoglikelihoodMatrix[j,i] <- 
+        ans["negLogLikelihood"]
+    }
+  }
+  return(list(distanceMatrix=distanceMatrix,
+              varianceMatrix=varianceMatrix,
+              negLoglikelihoodMatrix=negLoglikelihoodMatrix))
+}
+
+
 

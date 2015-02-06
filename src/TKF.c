@@ -202,14 +202,13 @@ double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
       substModel, eqFrequencies, SA, SB);
   // free the allocated matrix
   gsl_matrix_free(substModel);
-  Rprintf("The mu, distance and 2D likelihood is \n");
-  Rprintf("%f\t%f\t%f\n", mu, distance, likelihood);
+  //Rprintf("The mu, distance and 2D likelihood is \n");
+  //Rprintf("%f\t%f\t%f\n", mu, distance, likelihood);
   return likelihood;
 }
 
 void TKF91LikelihoodFunction2D_df(const gsl_vector *v, void *params,
     gsl_vector *df){
-  Rprintf("run numerical df\n");
   gsl_vector *mEps = gsl_vector_alloc(2);
   gsl_vector_set(mEps, 0, 0.1);  // from Tools/aligner.cpp, tkf2d.setEps(Vector2d(0.1,0.01));
   gsl_vector_set(mEps, 1, 0.01); // from Tools/aligner.cpp
@@ -416,7 +415,6 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   T = gsl_multimin_fdfminimizer_vector_bfgs2;
   double accuracy = 0.1;
   s = gsl_multimin_fdfminimizer_alloc(T, 2);
-  Rprintf("I am here1!\n");
   gsl_multimin_fdfminimizer_set(s, &F, x, mInitStepSize, accuracy);
 
   printf("using %s method\n",
@@ -424,7 +422,6 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
   do
   {
     iter++;
-    Rprintf("Iteration: %d\n", iter);
     status = gsl_multimin_fdfminimizer_iterate(s);
     if(status){
       Rprintf("The status code: %d\n", status);
@@ -514,7 +511,6 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   T = gsl_multimin_fminimizer_nmsimplex2;
   double accuracy = 0.1;
   s = gsl_multimin_fminimizer_alloc(T, 2);
-  Rprintf("I am here1!\n");
   gsl_multimin_fminimizer_set(s, &F, x, ss);
 
   printf("using %s method\n",
@@ -522,7 +518,6 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   do
   {
     iter++;
-    Rprintf("Iteration: %d\n", iter);
     status = gsl_multimin_fminimizer_iterate(s);
     if(status){
       Rprintf("The status code: %d\n", status);
