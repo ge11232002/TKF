@@ -82,7 +82,7 @@ AAToInt <- function(AA){
 ### n additions in log space.
 ### Different from Darwin, here PAM1[i,j] means the transition probability
 ### from i to j.
-###
+### Exported!
 PAMn <- function(PAM1, n){
   ## Validated by Darwin
   require(expm)
@@ -100,7 +100,7 @@ PAMn <- function(PAM1, n){
 ### of two AA. We now have such matrices. 
 ### Remember that we are interested in the ratio: 
 ### P("alignment i and j arose through evolution") /  P("alignment i and j arose by chance")
-###
+### Exported!
 Dayhoffn <- function(PAM1, BF, n){
   ## Verified by Darwin
   require(expm)

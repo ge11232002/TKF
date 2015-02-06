@@ -34,7 +34,7 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
     By default, the average sequence length, 362, from OMA browser is used.
   }
   \item{substModel}{
-    A \link{numeric} \link{matrix}: the mutation probability of from one AA
+    A \link{numeric} \link{matrix}: the mutation probability from one AA
     to another AA at PAM distance 1. 
     The order of AA in the matrix should be identical to \link{AACharacterSet}.
     By default, the GONNET matrix is used.
