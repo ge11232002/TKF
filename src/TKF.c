@@ -504,8 +504,8 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   // Set initial step sizes 
   gsl_vector *ss;
   ss = gsl_vector_alloc(2);
-  gsl_vector_set(ss, 0, 0.01);
-  gsl_vector_set(ss, 1, 1);
+  gsl_vector_set(ss, 0, 1);
+  gsl_vector_set(ss, 1, 0.01);
 
   // Initialize method and iterate
   F.n = 2;
@@ -558,7 +558,7 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   gsl_multimin_fminimizer_free(s);
 
   UNPROTECT(2);
-  return R_NilValue;
+  return ans;
 }
 
 
