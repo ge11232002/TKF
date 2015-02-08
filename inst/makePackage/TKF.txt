@@ -8,17 +8,30 @@ gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -sing
 R CMD BUILD  TKF
 R CMD INSTALL TKF_0.0.1.tar.gz
 R CMD check TKF_0.0.1.tar.gz
+
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF91.R")
+source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF92.R")
 load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
+load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNETBF.rda")
 dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
 
 ## Read fasta
 library(seqinr)
 library(numDeriv)
-fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
+fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/pair2.fasta" , seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
+
+## TKF92 1D
+seq1Int <- AAToInt(seq1)
+seq2Int <- AAToInt(seq2)
+## for the C matrix index
+seq1Int <- seq1Int - 1L
+seq2Int <- seq2Int - 1L
+ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04, r=0.8, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
+
+
 ## 1D
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 TKF91(fasta, mu=5.920655e-04)
@@ -29,6 +42,7 @@ TKF91(fasta)
 TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
 
 
+TKF92Pair(seq1, seq2, mu=5.920655e-04, r=0.8, substModel=GONNET, substModelBF=GONNETBF)
 
 
 mu = 0.0013
