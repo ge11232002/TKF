@@ -9,6 +9,7 @@
 #include <R_ext/Rdynload.h>
 #include "matrix.h"
 #include "MathFunctions.h"
+#include <math.h> // pow
 
 /********************************************************************
  * TKF92 stuff
