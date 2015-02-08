@@ -3,67 +3,224 @@
 double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     double mu, double r, double distance, gsl_matrix *substModel, 
     gsl_vector *eqFrequencies, int SA, int SB){
-  double lambda = len / (len + 1.0) * mu;
-  double alpha = -mu * distance;
-  double lmt = exp((lambda-mu)*distance);
+  //double lambda = len / (len + 1.0) * mu; TKF91
+  // The way to calculate the lambda, from Page 9, formular 10.
+  double lambda = mu * (len * (1.0 - r) - 2.0 * r + sqrt(len * len * (1.0 - r) * (1.0 - r) + 4.0 * r)) / (2.0 * (len + 1.0) * (1.0 - r));
+  //double alpha = -mu * distance;
+  //double lmt = exp((lambda-mu)*distance);
   double lbeta = log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
   double beta = exp(lbeta); // beta is  not a very small number.
   double P1t = exp(- mu * distance) * (1.0 - lambda * beta);
   double lP12t = log1x(-lambda * beta);
   double lP01t = log(mu) + lbeta;
   double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
+  double lP22t = log1x(-lambda * beta) + log(lambda) + lbeta;
+
   // initialize the entries tables, only log-likelihood is stored in thie table
-  gsl_matrix *L0 = gsl_matrix_alloc(SA+1, SB+1);
   gsl_matrix *L1 = gsl_matrix_alloc(SA+1, SB+1);
   gsl_matrix *L2 = gsl_matrix_alloc(SA+1, SB+1);
-  // initialize the boundary conditions
-  gsl_matrix_set(L0, 0, 0, -INFINITY);
-  gsl_matrix_set(L2, 0, 0, -INFINITY);
-  gsl_matrix_set(L1, 0, 0, lP12t + log1x(-lambda/mu));
+  gsl_matrix *L3 = gsl_matrix_alloc(SA+1, SB+1);
+  gsl_matrix *L4 = gsl_matrix_alloc(SA+1, SB+1);
+  gsl_matrix *L5 = gsl_matrix_alloc(SA+1, SB+1);
+  gsl_matrix *L6 = gsl_matrix_alloc(SA+1, SB+1);
 
+  // initialize the boundary conditions
+  gsl_matrix_set(L1, 0, 0, log1x(-lambda/mu) + lP12t);
+  gsl_matrix_set(L2, 0, 0, -INFINITY);
+  gsl_matrix_set(L3, 0, 0, -INFINITY);
+  gsl_matrix_set(L4, 0, 0, -INFINITY);
+  gsl_matrix_set(L5, 0, 0, -INFINITY);
+  gsl_matrix_set(L6, 0, 0, -INFINITY);
+  
+  gsl_matrix_set(L2, 1, 0, log((1-lambda/mu)*lambda/mu*(1-r)) + lP12t + log(gsl_vector_get(eqFrequencies, seq1Int[0])) + lP01t);
+  gsl_matrix_set(L1, 1, 0, -INFINITY);
+  gsl_matrix_set(L3, 1, 0, -INFINITY);
+  gsl_matrix_set(L4, 1, 0, -INFINITY);
+  gsl_matrix_set(L5, 1, 0, -INFINITY);
+  gsl_matrix_set(L6, 1, 0, -INFINITY);
   int i, j;
   double temp;
   temp = 0;
-  for(i = 1; i <= SA; i++){
-    temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + lP01t;
-    gsl_matrix_set(L0, i, 0, log1x(-lambda/mu) + i * (log(lambda) - log(mu)) + lP12t + temp);
+  for(i = 2; i <= SA; i++){
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + log(r) + log1x(exp(lP01t) * (1-r) / r * lambda / mu);
+    gsl_matrix_set(L2, i, 0, log((1-lambda/mu)*lambda/mu*(1-r)) + lP12t + log(gsl_vector_get(eqFrequencies, seq1Int[0])) + lP01t + temp);
     gsl_matrix_set(L1, i, 0, -INFINITY);
-    gsl_matrix_set(L2, i, 0, -INFINITY);
+    gsl_matrix_set(L3, i, 0, -INFINITY);
+    gsl_matrix_set(L4, i, 0, -INFINITY);
+    gsl_matrix_set(L5, i, 0, -INFINITY);
+    gsl_matrix_set(L6, i, 0, -INFINITY);
   }
+
+  gsl_matrix_set(L3, 0, 1, log1x(-lambda/mu) + lP22t + log1x(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])));
+  gsl_matrix_set(L1, 0, 1, -INFINITY);
+  gsl_matrix_set(L2, 0, 1, -INFINITY);
+  gsl_matrix_set(L4, 0, 1, -INFINITY);
+  gsl_matrix_set(L5, 0, 1, -INFINITY);
+  gsl_matrix_set(L6, 0, 1, -INFINITY);
   temp = 0;
-  for(j = 1; j <= SB; j++){
-    temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1]));
-    gsl_matrix_set(L2, 0, j, log1x(-lambda/mu) + lP12t + j * (log(lambda) + lbeta) + temp);
+  for(j = 2; j <= SB; j++){
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + log(r) + log1x(lambda/r*beta*(1-r));
+    gsl_matrix_set(L3, 0, j, log1x(-lambda/mu) + lP22t + log1x(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])) + temp);
     gsl_matrix_set(L1, 0, j, -INFINITY);
-    gsl_matrix_set(L0, 0, j, -INFINITY);
+    gsl_matrix_set(L2, 0, j, -INFINITY);
+    gsl_matrix_set(L4, 0, j, -INFINITY);
+    gsl_matrix_set(L5, 0, j, -INFINITY);
+    gsl_matrix_set(L6, 0, j, -INFINITY);
   }
 
   //recursive iteration
+  double Km, Kn;
+  double A, B;
   for(i = 1; i <= SA; i++){
     for(j = 1; j <= SB; j++){
-      temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, i-1, j),
-            gsl_matrix_get(L1, i-1, j)),
-          gsl_matrix_get(L2, i-1, j));
-      gsl_matrix_set(L0, i, j, log(lambda) - log(mu) + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + lP01t + temp + log(exp(gsl_matrix_get(L0, i-1, j) - temp) + exp(gsl_matrix_get(L1, i-1, j) - temp) + exp(gsl_matrix_get(L2, i-1, j) - temp)));
-      temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, i-1, j-1), gsl_matrix_get(L1, i-1, j-1)), gsl_matrix_get(L2, i-1, j-1));
-      gsl_matrix_set(L1, i, j, log(lambda) - log(mu) + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + log(gsl_matrix_get(substModel, seq1Int[i-1], seq2Int[j-1]) * P1t + gsl_vector_get(eqFrequencies, seq2Int[j-1]) * P11t) + temp + log(exp(gsl_matrix_get(L0, i-1, j-1) - temp) + exp(gsl_matrix_get(L1, i-1, j-1) - temp) + exp(gsl_matrix_get(L2, i-1, j-1) - temp)));
-
-      if(isfinite(gsl_matrix_get(L1, i, j-1)) || isfinite(gsl_matrix_get(L2, i, j-1))){
-        temp = GSL_MAX(gsl_matrix_get(L1, i, j-1), gsl_matrix_get(L2, i,j-1));
-        gsl_matrix_set(L2, i, j, log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + log(lambda) + lbeta + temp + log(exp(gsl_matrix_get(L1, i, j-1) - temp) + exp(gsl_matrix_get(L2, i, j-1) - temp)));
+      if(i == 1){
+        Km = 0.0;
       }else{
-        gsl_matrix_set(L2, i, j, -INFINITY);
+        Km = 1.0;
+      }
+      if(j == 1){
+        Kn = 0.0;
+      }else{
+        Kn = 1.0;
+      }
+      // we need some tricks to calculate the log of sums of exponentials
+      A = r * Km * Kn;
+      B = P1t * (1 - r) * lambda / mu;
+      temp = GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(
+                  pow(gsl_matrix_get(L1, i-1, j-1), (1+A/B)),
+                  gsl_matrix_get(L2, i-1, j-1)),
+                  gsl_matrix_get(L3, i-1, j-1)),
+                  gsl_matrix_get(L4, i-1, j-1)),
+                  gsl_matrix_get(L5, i-1, j-1)),
+                  gsl_matrix_get(L6, i-1, j-1)
+                  );
+      gsl_matrix_set(L1, i, j, 
+          log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + 
+          log(gsl_matrix_get(substModel, seq1Int[i-1], seq2Int[j-1])) +
+          log(B) + temp +
+          log(exp(pow(gsl_matrix_get(L1, i-1, j-1), (1+A/B)) - temp) +
+              exp(gsl_matrix_get(L2, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L3, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L4, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L5, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L6, i-1, j-1) - temp)
+            )
+          );
+
+      A = r * Km;
+      B = exp(lP01t) * (1 - r)  * lambda / mu;
+      temp = GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(
+                  gsl_matrix_get(L1, i-1, j),
+                  pow(gsl_matrix_get(L2, i-1, j), (1+A/B))),
+                  gsl_matrix_get(L3, i-1, j)),
+                  gsl_matrix_get(L4, i-1, j)),
+                  gsl_matrix_get(L5, i-1, j)),
+                  gsl_matrix_get(L6, i-1, j)
+                  );
+      gsl_matrix_set(L2, i, j,
+          log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) +
+          log(B) + temp +
+          log(exp(gsl_matrix_get(L1, i-1, j) - temp) +
+              exp(pow(gsl_matrix_get(L2, i-1, j), (1+A/B)) - temp) +
+              exp(gsl_matrix_get(L3, i-1, j) - temp) +
+              exp(gsl_matrix_get(L4, i-1, j) - temp) + 
+              exp(gsl_matrix_get(L5, i-1, j) - temp) + 
+              exp(gsl_matrix_get(L6, i-1, j) - temp)
+            )
+          );
+
+      if(isfinite(gsl_matrix_get(L1, i, j-1)) || isfinite(gsl_matrix_get(L3, i, j-1)) || isfinite(gsl_matrix_get(L4, i, j-1)) || isfinite(gsl_matrix_get(L5, i, j-1)) || isfinite(gsl_matrix_get(L6, i, j-1))){
+        A = r * Kn;
+        B = lambda * beta * (1 - r);
+        temp = GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(
+                    gsl_matrix_get(L1, i, j-1),
+                    pow(gsl_matrix_get(L3, i, j-1), (1+A/B))),
+                    gsl_matrix_get(L4, i, j-1)),
+                    gsl_matrix_get(L5, i, j-1)),
+                    gsl_matrix_get(L6, i, j-1)
+              );
+        gsl_matrix_set(L3, i, j,
+            log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + 
+            log(B) + temp +
+            log(exp(gsl_matrix_get(L1, i, j-1) - temp) +
+                exp(pow(gsl_matrix_get(L3, i, j-1), (1+A/B)) - temp) +
+                exp(gsl_matrix_get(L4, i, j-1) - temp) + 
+                exp(gsl_matrix_get(L5, i, j-1) - temp) +
+                exp(gsl_matrix_get(L6, i, j-1) - temp)
+              )
+            );
+      }esle{
+        gsl_matrix_set(L3, i, j, -INFINITY);
+      }
+
+      A = r * r * Km * Kn;
+      B = P11t * power((1 - r), 2) * lambda / mu;
+      temp = GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(
+                  gsl_matrix_get(L1, i-1, j-1),
+                  gsl_matrix_get(L2, i-1, j-1)),
+                  gsl_matrix_get(L3, i-1, j-1)),
+                  power(gsl_matrix_get(L4, i-1, j-1), (1+A/B))),
+                  gsl_matrix_get(L5, i-1, j-1)),
+                  gsl_matrix_get(L6, i-1, j-1)
+                  );
+      gsl_matrix_set(L4, i, j,
+          log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + 
+          log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) +
+          log(B) + temp +
+          log(exp(gsl_matrix_get(L1, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L2, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L3, i-1, j-1) - temp) +
+              exp(power(gsl_matrix_get(L4, i-1, j-1), (1+A/B)) - temp) +
+              exp(gsl_matrix_get(L5, i-1, j-1) - temp) +
+              exp(gsl_matrix_get(L6, i-1, j-1) - temp)
+            )
+          );
+
+      if(isfinite(gsl_matrix_get(L4, i-1, j)) || isfinite(gsl_matrix_get(L5, i-1, j))){
+        temp = GSL_MAX(gsl_matrix_get(L4, i-1, j),
+                       gsl_matrix_get(L5, i-1, j)
+                       );
+        gsl_matrix_set(L5, i, j,
+            log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) +
+            log(Km * Kn) + log(r) + temp +
+            log(exp(gsl_vector_get(L4, i-1, j) - temp) + 
+                exp(gsl_matrix_get(L5, i-1, j) - temp))
+            );
+      }else{
+        gsl_matrix_set(L5, i, j, -INFINITY);
+      }
+
+      if(isfinite(gsl_matrix_get(L4, i, j-1)) || isfinite(gsl_matrix_get(L6, i,j-1))){
+        temp = GSL_MAX(gsl_matrix_get(L4, i, j-1), gsl_matrix_get(L6, i,j-1));
+        gsl_matrix_set(L6, i, j,
+            log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) +
+            log(Km * Kn) + log(r) + temp +
+            log(exp(gsl_vector_get(L4, i, j-1) - temp) +
+                exp(gsl_matrix_get(L6, i, j-1) - temp))
+            );
+      }else{
+        gsl_matrix_set(L6, i, j, -INFINITY);
       }
     }
   }
 
-  temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, SA, SB), gsl_matrix_get(L1, SA, SB)), gsl_matrix_get(L2, SA, SB));
+  temp = GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(GSL_MAX(gsl_matrix_get(L1, SA, SB), gsl_matrix_get(L2, SA, SB)), gsl_matrix_get(L3, SA, SB)), gsl_matrix_get(L4, SA, SB)), gsl_matrix_get(L5, SA, SB)), gsl_matrix_get(L6, SA, SB));
   double likelihood;
-  likelihood = -(temp + log(exp(gsl_matrix_get(L0, SA, SB) - temp) + exp(gsl_matrix_get(L1, SA, SB) - temp) + exp(gsl_matrix_get(L2, SA, SB) - temp)));
+  likelihood = -(temp + log(exp(gsl_matrix_get(L1, SA, SB) - temp) + 
+                            exp(gsl_matrix_get(L2, SA, SB) - temp) +
+                            exp(gsl_matrix_get(L3, SA, SB) - temp) + 
+                            exp(gsl_matrix_get(L4, SA, SB) - temp) +
+                            exp(gsl_matrix_get(L5, SA, SB) - temp) + 
+                            exp(gsl_matrix_get(L6, SA, SB) - temp))
+                );
+
   // free the allocated matrix
-  gsl_matrix_free(L0);
   gsl_matrix_free(L1);
   gsl_matrix_free(L2);
+  gsl_matrix_free(L3);
+  gsl_matrix_free(L4);
+  gsl_matrix_free(L5);
+  gsl_matrix_free(L6);
   return likelihood;
 }
 
@@ -256,14 +413,16 @@ SEXP TKF92LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   while (status == GSL_CONTINUE && iter < max_iter);
  
   SEXP ans, ansNames;
-  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
-  PROTECT(ansNames = NEW_CHARACTER(3));
+  PROTECT(ans = NEW_NUMERIC(4)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(4));
   REAL(ans)[0] = x;
   REAL(ans)[1] = REAL(muR)[0];
-  REAL(ans)[2] = gsl_min_fminimizer_f_minimum(s); 
+  REAL(ans)[2] = REAL(rR)[0];
+  REAL(ans)[3] = gsl_min_fminimizer_f_minimum(s); 
   SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
   SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
-  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_STRING_ELT(ansNames, 2, mkChar("r"));
+  SET_STRING_ELT(ansNames, 3, mkChar("negLogLikelihood"));
   SET_NAMES(ans, ansNames);
   
   // free the allocation
