@@ -15,8 +15,8 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   double lP01t = log(mu) + lbeta;
   double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
   double lP22t = log1x(-lambda * beta) + log(lambda) + lbeta;
-  Rprintf("the beta is %f\n", beta);
-  Rprintf("the lambda is %f\n", lambda);
+  //Rprintf("the beta is %f\n", beta);
+  //Rprintf("the lambda is %f\n", lambda);
 
   // initialize the entries tables, only log-likelihood is stored in thie table
   gsl_matrix *L1 = gsl_matrix_alloc(SA+1, SB+1);
@@ -70,24 +70,6 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     gsl_matrix_set(L6, 0, j, -INFINITY);
   }
 
-  Rprintf("L1\n");
-  printGSLMatrix(L1);
-  Rprintf("L1 end \n");
-  Rprintf("L2\n");
-  printGSLMatrix(L2);
-  Rprintf("L2 end \n");
-  Rprintf("L3\n");
-  printGSLMatrix(L3);
-  Rprintf("L3 end \n");
-  Rprintf("L4\n");
-  printGSLMatrix(L4);
-  Rprintf("L4 end \n");
-  Rprintf("L5\n");
-  printGSLMatrix(L5);
-  Rprintf("L5 end \n");
-  Rprintf("L6\n");
-  printGSLMatrix(L6);
-  Rprintf("L6 end \n");
 
   //recursive iteration
   double Km, Kn;
@@ -247,24 +229,24 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
                             exp(gsl_matrix_get(L6, SA, SB) - temp))
                 );
 
-  Rprintf("L1\n");
-  printGSLMatrix(L1);
-  Rprintf("L1 end \n");
-  Rprintf("L2\n");
-  printGSLMatrix(L2);
-  Rprintf("L2 end \n");
-  Rprintf("L3\n");
-  printGSLMatrix(L3);
-  Rprintf("L3 end \n");
-  Rprintf("L4\n");
-  printGSLMatrix(L4);
-  Rprintf("L4 end \n");
-  Rprintf("L5\n");
-  printGSLMatrix(L5);
-  Rprintf("L5 end \n");
-  Rprintf("L6\n");
-  printGSLMatrix(L6);
-  Rprintf("L6 end \n");
+//  Rprintf("L1\n");
+//  printGSLMatrix(L1);
+//  Rprintf("L1 end \n");
+//  Rprintf("L2\n");
+//  printGSLMatrix(L2);
+//  Rprintf("L2 end \n");
+//  Rprintf("L3\n");
+//  printGSLMatrix(L3);
+//  Rprintf("L3 end \n");
+//  Rprintf("L4\n");
+//  printGSLMatrix(L4);
+//  Rprintf("L4 end \n");
+//  Rprintf("L5\n");
+//  printGSLMatrix(L5);
+//  Rprintf("L5 end \n");
+//  Rprintf("L6\n");
+//  printGSLMatrix(L6);
+//  Rprintf("L6 end \n");
 
   // free the allocated matrix
   gsl_matrix_free(L1);
@@ -274,8 +256,8 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   gsl_matrix_free(L5);
   gsl_matrix_free(L6);
 
-  Rprintf("The distance, mu, r and likelihood are: \n");
-  Rprintf("%f\t%f\t%f\t%f\n", distance, mu, r, likelihood);
+//  Rprintf("The distance, mu, r and likelihood are: \n");
+//  Rprintf("%f\t%f\t%f\t%f\n", distance, mu, r, likelihood);
 
   return likelihood;
 }
