@@ -319,14 +319,16 @@ SEXP TKF92LikelihoodFunctionWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR
       substModel, eqFrequencies, SA, SB);
 
   SEXP ans, ansNames;
-  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
-  PROTECT(ansNames = NEW_CHARACTER(3));
+  PROTECT(ans = NEW_NUMERIC(4)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(4));
   REAL(ans)[0] = REAL(distanceR)[0];
   REAL(ans)[1] = REAL(muR)[0];
-  REAL(ans)[2] = likelihood;
+  REAL(ans)[2] = REAL(rR)[0];
+  REAL(ans)[3] = likelihood;
   SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
   SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
-  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_STRING_ELT(ansNames, 2, mkChar("r"));
+  SET_STRING_ELT(ansNames, 3, mkChar("negLogLikelihood"));
   SET_NAMES(ans, ansNames);
 
   // free the allocated matrix

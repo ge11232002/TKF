@@ -23,14 +23,19 @@ fasta <- read.fasta(file="/Users/gtan/Repositories/Bitbucket/TKF/inst/TestData/p
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 
-## TKF92 1D
+## TKF92 3D
 seq1Int <- AAToInt(seq1)
 seq2Int <- AAToInt(seq2)
 ## for the C matrix index
 seq1Int <- seq1Int - 1L
 seq2Int <- seq2Int - 1L
-ans <- .Call("TKF92LikelihoodFunction3DMainNM", seq1Int, seq2Int, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
+#ans <- .Call("TKF92LikelihoodFunction3DMainNM", seq1Int, seq2Int, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
+expectedLength=362
+substModel=GONNET
+substModelBF=GONNETBF
+ans <- TKF92Pair(seq1, seq2, expectedLength=362, substModel=GONNET, substModelBF=GONNETBF)
 
+## TKF92 1D
 ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04, r=0.8, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
 
 

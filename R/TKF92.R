@@ -31,7 +31,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
              "coVariancePAMMu"=solve(ansHessian)[1,2],
              "coVariancePAMr"=solve(ansHessian)[1,3],
              "coVarianceMur"=solve(ansHessian)[2,3]
-             ),
+             )
            )
   }else if(!is.null(mu) && is.null(distance) && !is.null(r)){
     ## Do the 1D distance optimisation
@@ -63,7 +63,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
              "coVariancePAMMu"=solve(ansHessian)[1,2],
              "coVariancePAMr"=solve(ansHessian)[1,3],
              "coVarianceMur"=solve(ansHessian)[2,3]
-             ),
+             )
            )
   }else{
     stop("You cannot estimate mu or r alone!")
