@@ -265,7 +265,7 @@ SEXP TKF91LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   F.params = &params;
   double x_lo = 0.0494497, x_hi = 2000; 
   double x = 100;
-  double mEps = 0.001;
+  double mEps = 1e-5;
 
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
