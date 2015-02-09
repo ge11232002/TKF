@@ -8,7 +8,7 @@ Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>
 Imports: methods, expm, numDeriv
 Depends: R (>= 3.0.2)
 Suggests: RUnit, seqinr
-System Requirements: gsl
+SystemRequirements: gsl
 License: GPL-2
 Type: Package
 NeedsCompilation: yes
