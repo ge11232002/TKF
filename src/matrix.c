@@ -6,47 +6,44 @@
  ************************************************************************/
 
 #include<stdio.h>
-#include<gsl/gsl_matrix.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_eigen.h>
-#include <gsl/gsl_complex_math.h>
-#include <gsl/gsl_permutation.h>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_blas.h> 
 #include "matrix.h"
 #include "assert.h"
 
 /*********************************************************************
  * Print a GSL matrix in a proper shape
  ********************************************************************/
-int printGSLMatrix(const gsl_matrix *m){
-  int status, n = 0;
+void printGSLMatrix(const gsl_matrix *m){
+  //int status, n = 0;
   for(size_t i = 0; i < m->size1; i++){
     for(size_t j = 0; j < m->size2; j++){
-      if((status = printf("%g ", gsl_matrix_get(m, i, j))) < 0)
-        return -1;
-       n += status;
+      //if((status = printf("%g ", gsl_matrix_get(m, i, j))) < 0)
+      //  return -1;
+      // n += status;
+      Rprintf("%g ", gsl_matrix_get(m, i, j));
     }
-    if((status = printf("\n")) < 0)
-      return -1;
-    n += status;
+    //if((status = printf("\n")) < 0)
+    Rprintf("\n");
+    //  return -1;
+    //n += status;
   }
-  return n;
+  //return n;
 }
 
-int printGSLMatrixComplex(const gsl_matrix_complex *m){
-  int status, n = 0;
+void printGSLMatrixComplex(const gsl_matrix_complex *m){
+  //int status, n = 0;
   for(size_t i = 0; i < m->size1; i++){
     for(size_t j = 0; j < m->size2; j++){
-      if((status = printf("%g ", GSL_REAL(gsl_matrix_complex_get(m, i, j)))) < 0)
-          return -1;
-      n += status;
+      //if((status = printf("%g ", GSL_REAL(gsl_matrix_complex_get(m, i, j)))) < 0)
+      //    return -1;
+      //n += status;
+      Rprintf("%g ", GSL_REAL(gsl_matrix_complex_get(m, i, j)));
     }
-    if((status = printf("\n")) < 0)
-      return -1;
-    n += status;
+    //if((status = printf("\n")) < 0)
+    //  return -1;
+    //n += status;
+    Rprintf("\n");
   }
-  return n;
+  //return n;
 }
 
 /********************************************************************
