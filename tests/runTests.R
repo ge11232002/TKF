@@ -1,4 +1,4 @@
-#BiocGenerics:::testPackage("TFMPvalue")
+#BiocGenerics:::testPackage("TKF")
 testPackage <- function (pkgname, subdir = "unitTests",
                           pattern = "^test_.*\\.R$")
 {

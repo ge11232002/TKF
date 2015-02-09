@@ -44,6 +44,9 @@
 }
 \references{
 Dayhoff, M.O., and Schwartz, R.M. (1978). A model of evolutionary change in proteins. In In Atlas of Protein Sequence and Structure,.
+
+Gonnet, G.H., and Scholl, R. (2009). Scientific Computation (Cambridge, UK; New York: Cambridge University Press).
+
 }
 
 \author{

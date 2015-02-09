@@ -3,7 +3,8 @@ test_TKF92 <- function(){
   library(seqinr)
   data(GONNET)
   data(GONNETBF)
-  fasta <- read.fasta(file.path(system.file("extdata", package="TKF")),
+  fasta <- read.fasta(file.path(system.file("extdata", package="TKF"), 
+                                "pair1.fasta"),
                       seqtype="AA", set.attributes=FALSE)
 
   ## 1D estimation: only distance
