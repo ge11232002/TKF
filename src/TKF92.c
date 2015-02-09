@@ -517,23 +517,24 @@ SEXP TKF92LikelihoodFunction3DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   
   // starting points
   gsl_vector *x;
-  x = gsl_vector_alloc(2);
+  x = gsl_vector_alloc(3);
   gsl_vector_set(x, 0, 100); // distance, from Tools/aligner.cpp,  Vector2d(-3.0, 2.0); in Exp scale.
   gsl_vector_set(x, 1, exp(-3)); // mu, same
+  gsl_vector_set(x, 2, 0.5); // r
 
   // Set initial step sizes 
   gsl_vector *ss;
-  ss = gsl_vector_alloc(2);
+  ss = gsl_vector_alloc(3);
   gsl_vector_set(ss, 0, 1);
   gsl_vector_set(ss, 1, 0.01);
+  gsl_vector_set(ss, 2, 0.1);
 
   // Initialize method and iterate
-  F.n = 2;
+  F.n = 3;
   F.f = &TKF92LikelihoodFunction3D;
   F.params = &params;
   T = gsl_multimin_fminimizer_nmsimplex2;
-  double accuracy = 0.1;
-  s = gsl_multimin_fminimizer_alloc(T, 2);
+  s = gsl_multimin_fminimizer_alloc(T, 3);
   gsl_multimin_fminimizer_set(s, &F, x, ss);
 
   Rprintf("using %s method\n",
@@ -549,25 +550,28 @@ SEXP TKF92LikelihoodFunction3DMainNM(SEXP seq1IntR, SEXP seq2IntR,
     size = gsl_multimin_fminimizer_size(s);
     status = gsl_multimin_test_size (size, 1e-5);
     if(status == GSL_SUCCESS){
-      Rprintf("converged to minimu at \n");
+      Rprintf("converged to minimu at distance  mu  r  neg-log-likelihood  size\n");
     }
-    Rprintf("%5d %10.3e %10.3e f() = %7.3f size = %.5f\n", 
+    Rprintf("%5d %10.3e %10.3e %10.3e f() = %7.3f size = %.5f\n", 
         iter,
         gsl_vector_get (s->x, 0), 
         gsl_vector_get (s->x, 1), 
+        gsl_vector_get (s->x, 2),
         s->fval, size);
   }
   while(status == GSL_CONTINUE && iter < max_iter);
 
   SEXP ans, ansNames;
-  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
-  PROTECT(ansNames = NEW_CHARACTER(3));
+  PROTECT(ans = NEW_NUMERIC(4)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(4));
   REAL(ans)[0] = gsl_vector_get (s->x, 0);
   REAL(ans)[1] = gsl_vector_get (s->x, 1);
-  REAL(ans)[2] = s->fval;
+  REAL(ans)[2] = gsl_vector_get(s->x, 2);
+  REAL(ans)[3] = s->fval;
   SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
   SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
-  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_STRING_ELT(ansNames, 2, mkChar("r"));
+  SET_STRING_ELT(ansNames, 3, mkChar("negLogLikelihood"));
   SET_NAMES(ans, ansNames);
 
   // free everything

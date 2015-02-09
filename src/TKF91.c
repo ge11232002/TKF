@@ -395,7 +395,7 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
     }
     status = gsl_multimin_test_gradient(s->gradient, mAccuracy);
     if(status == GSL_SUCCESS){
-      Rprintf("converged to minimu at \n");
+      Rprintf("converged to minimu at distance  mu  neg-log-likelihood\n");
     }
     Rprintf("%5d %.5f %.5f %10.5f\n",
         iter,
