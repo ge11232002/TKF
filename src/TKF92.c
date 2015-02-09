@@ -145,12 +145,6 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
                     gsl_matrix_get(L5, i, j-1)),
                     gsl_matrix_get(L6, i, j-1)
               );
-        if(i == 1 & j ==3){
-          Rprintf("The temp, A, B, eqF, expL3\n");
-          Rprintf("%f\t%f\t%f\t%f\t%f\n", temp, A, B, 
-              gsl_vector_get(eqFrequencies, seq2Int[j-1]),
-              gsl_matrix_get(L3, i, j-1));
-        }
         gsl_matrix_set(L3, i, j,
             log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + 
             temp +
@@ -422,7 +416,7 @@ SEXP TKF92LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
   F.params = &params;
   double x_lo = 0.0494497, x_hi = 2000; 
   double x = 100;
-  double mEps = 0.001;
+  double mEps = 1e-5;
 
   T = gsl_min_fminimizer_brent;
   s = gsl_min_fminimizer_alloc (T);
