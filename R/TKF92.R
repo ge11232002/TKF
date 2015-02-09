@@ -70,4 +70,30 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   }
 }
 
+TKF92 <- function(fasta, mu=NULL, r=NULL, expectedLength=362,
+                  substModel, substModelBF){
+  seqnames <- names(fasta)
+  nSeqs <- length(fasta)
+  distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
+                           dimnames=list(seqnames, seqnames))
+  varianceMatrix <- distanceMatrix
+  negLoglikelihoodMatrix <- distanceMatrix
+  for(i in 1:(nSeqs-1L)){
+    for(j in (i+1L):nSeqs){
+      message(seqnames[i], " vs ", seqnames[j])
+      ans <- TKF92Pair(fasta[[i]], fasta[[j]],
+                       mu=mu, r=r, expectedLength=expectedLength,
+                       substModel=substModel, substModelBF=substModelBF)
+      distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
+      varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
+      negLoglikelihoodMatrix[i,j] <- negLoglikelihoodMatrix[j,i] <-
+        ans["negLogLikelihood"]
+    }
+  }
+  return(list(distanceMatrix=distanceMatrix,
+              varianceMatrix=varianceMatrix,
+              negLoglikelihoodMatrix=negLoglikelihoodMatrix))
+}
+
+
 

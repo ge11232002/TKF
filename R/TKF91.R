@@ -75,7 +75,7 @@ TKF91 <- function(fasta, mu=NULL, expectedLength=362,
   for(i in 1:(nSeqs-1L)){
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
-      ans <- TKF91Pair(fasta[[i]], fasta[[2]], 
+      ans <- TKF91Pair(fasta[[i]], fasta[[j]], 
                        mu=mu, expectedLength=expectedLength,
                        substModel=substModel, substModelBF=substModelBF)
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
