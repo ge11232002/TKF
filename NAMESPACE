@@ -16,7 +16,10 @@ export(
   AACharacterSet,
 
   ## TKF91.R
-  TKF91Pair, TKF91
+  TKF91Pair, TKF91,
+
+  ## TKF92.R
+  TKF92Pair, TKF92
   )
 
 

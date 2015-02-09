@@ -12,7 +12,7 @@
 \usage{
 TKF92(fasta, mu=NULL, r=NULL, expectedLength=362, 
       substModel, substModelBF)
-TKF91Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
+TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
           expectedLength=362, substModel, substModelBF)
 }
 
