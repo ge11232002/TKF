@@ -6,8 +6,8 @@ gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -sing
 
 
 R CMD BUILD  TKF
-R CMD INSTALL TKF_0.0.1.tar.gz
-R CMD check --as-cran TKF_0.0.1.tar.gz
+R CMD INSTALL TKF_0.0.2.tar.gz
+R CMD check --as-cran TKF_0.0.2.tar.gz
 
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
 source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF91.R")
