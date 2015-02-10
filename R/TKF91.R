@@ -9,6 +9,10 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                   ## mu: by default is 0.001 from median of mu values from Fungi dataset.
                   expectedLength=362, 
                   substModel, substModelBF){
+  if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
+    stop("This implementation currently only supports 20 AA characters ", 
+         paste(AACharacterSet, collapse=" "))
+  }
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
   ## for the C matrix index
