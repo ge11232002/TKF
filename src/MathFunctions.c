@@ -28,7 +28,7 @@ double log1x(double x){
   }else if(absX > 0.01){
     double sum = 0;
     double p = -1;
-    for(int i; i <= 18; i++){
+    for(int i=1; i <= 18; i++){
       p *= -x;
       sum += p/i;
     }

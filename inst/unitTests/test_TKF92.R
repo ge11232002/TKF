@@ -12,6 +12,6 @@ test_TKF92 <- function(){
   seq2 <- fasta[[2]]
   ans <- TKF92Pair(seq1, seq2, mu=0.0006137344, r=0.7016089061,
                    substModel=GONNET, substModelBF=GONNETBF)
-  checkEqualsNumeric(116.6474178326, ans["PAM"], tolerance=1e-3)
+  checkEqualsNumeric(116.6130887028, ans["PAM"], tolerance=1e-3)
 
 }

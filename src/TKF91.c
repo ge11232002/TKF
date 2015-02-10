@@ -6,12 +6,12 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   double lambda = len / (len + 1.0) * mu;
   double alpha = -mu * distance;
   double lmt = exp((lambda-mu)*distance);
-  double lbeta = log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
+  double lbeta = gsl_log1p(-exp((lambda-mu)*distance)) - (log(mu) + gsl_log1p(-lambda/mu * exp((lambda-mu)*distance)));
   double beta = exp(lbeta); // beta is  not a very small number.
   double P1t = exp(- mu * distance) * (1.0 - lambda * beta);
-  double lP12t = log1x(-lambda * beta);
+  double lP12t = gsl_log1p(-lambda * beta);
   double lP01t = log(mu) + lbeta;
-  double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
+  double P11t = (-gsl_expm1(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
   // initialize the entries tables, only log-likelihood is stored in thie table
   gsl_matrix *L0 = gsl_matrix_alloc(SA+1, SB+1);
   gsl_matrix *L1 = gsl_matrix_alloc(SA+1, SB+1);
@@ -19,24 +19,28 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   // initialize the boundary conditions
   gsl_matrix_set(L0, 0, 0, -INFINITY);
   gsl_matrix_set(L2, 0, 0, -INFINITY);
-  gsl_matrix_set(L1, 0, 0, lP12t + log1x(-lambda/mu));
+  gsl_matrix_set(L1, 0, 0, lP12t + gsl_log1p(-lambda/mu));
+
 
   int i, j;
   double temp;
   temp = 0;
+
+ 
   for(i = 1; i <= SA; i++){
     temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + lP01t;
-    gsl_matrix_set(L0, i, 0, log1x(-lambda/mu) + i * (log(lambda) - log(mu)) + lP12t + temp);
+    gsl_matrix_set(L0, i, 0, gsl_log1p(-lambda/mu) + i * (log(lambda) - log(mu)) + lP12t + temp);
     gsl_matrix_set(L1, i, 0, -INFINITY);
     gsl_matrix_set(L2, i, 0, -INFINITY);
   }
   temp = 0;
   for(j = 1; j <= SB; j++){
     temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1]));
-    gsl_matrix_set(L2, 0, j, log1x(-lambda/mu) + lP12t + j * (log(lambda) + lbeta) + temp);
+    gsl_matrix_set(L2, 0, j, gsl_log1p(-lambda/mu) + lP12t + j * (log(lambda) + lbeta) + temp);
     gsl_matrix_set(L1, 0, j, -INFINITY);
     gsl_matrix_set(L0, 0, j, -INFINITY);
   }
+
 
   //recursive iteration
   for(i = 1; i <= SA; i++){
@@ -60,6 +64,8 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   temp = GSL_MAX(GSL_MAX(gsl_matrix_get(L0, SA, SB), gsl_matrix_get(L1, SA, SB)), gsl_matrix_get(L2, SA, SB));
   double likelihood;
   likelihood = -(temp + log(exp(gsl_matrix_get(L0, SA, SB) - temp) + exp(gsl_matrix_get(L1, SA, SB) - temp) + exp(gsl_matrix_get(L2, SA, SB) - temp)));
+
+
   // free the allocated matrix
   gsl_matrix_free(L0);
   gsl_matrix_free(L1);

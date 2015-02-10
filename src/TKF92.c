@@ -8,13 +8,13 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   double lambda = mu * (len * (1.0 - r) - 2.0 * r + sqrt(len * len * (1.0 - r) * (1.0 - r) + 4.0 * r)) / (2.0 * (len + 1.0) * (1.0 - r));
   //double alpha = -mu * distance;
   //double lmt = exp((lambda-mu)*distance);
-  double lbeta = log1x(-exp((lambda-mu)*distance)) - (log(mu) + log1x(-lambda/mu * exp((lambda-mu)*distance)));
+  double lbeta = gsl_log1p(-exp((lambda-mu)*distance)) - (log(mu) + gsl_log1p(-lambda/mu * exp((lambda-mu)*distance)));
   double beta = exp(lbeta); // beta is  not a very small number.
   double P1t = exp(- mu * distance) * (1.0 - lambda * beta);
-  double lP12t = log1x(-lambda * beta);
+  double lP12t = gsl_log1p(-lambda * beta);
   double lP01t = log(mu) + lbeta;
-  double P11t = (-exp1x(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
-  double lP22t = log1x(-lambda * beta) + log(lambda) + lbeta;
+  double P11t = (-gsl_expm1(-mu*distance) - mu * beta) * (1.0 - lambda * beta);
+  double lP22t = gsl_log1p(-lambda * beta) + log(lambda) + lbeta;
   //Rprintf("the beta is %f\n", beta);
   //Rprintf("the lambda is %f\n", lambda);
 
@@ -27,7 +27,7 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   gsl_matrix *L6 = gsl_matrix_alloc(SA+1, SB+1);
 
   // initialize the boundary conditions
-  gsl_matrix_set(L1, 0, 0, log1x(-lambda/mu) + lP12t);
+  gsl_matrix_set(L1, 0, 0, gsl_log1p(-lambda/mu) + lP12t);
   gsl_matrix_set(L2, 0, 0, -INFINITY);
   gsl_matrix_set(L3, 0, 0, -INFINITY);
   gsl_matrix_set(L4, 0, 0, -INFINITY);
@@ -44,7 +44,7 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   double temp;
   temp = 0;
   for(i = 2; i <= SA; i++){
-    temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + log(r) + log1x(exp(lP01t) * (1-r) / r * lambda / mu);
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq1Int[i-1])) + log(r) + gsl_log1p(exp(lP01t) * (1-r) / r * lambda / mu);
     gsl_matrix_set(L2, i, 0, log((1-lambda/mu)*lambda/mu*(1-r)) + lP12t + log(gsl_vector_get(eqFrequencies, seq1Int[0])) + lP01t + temp);
     gsl_matrix_set(L1, i, 0, -INFINITY);
     gsl_matrix_set(L3, i, 0, -INFINITY);
@@ -53,7 +53,7 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     gsl_matrix_set(L6, i, 0, -INFINITY);
   }
 
-  gsl_matrix_set(L3, 0, 1, log1x(-lambda/mu) + lP22t + log1x(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])));
+  gsl_matrix_set(L3, 0, 1, gsl_log1p(-lambda/mu) + lP22t + gsl_log1p(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])));
   gsl_matrix_set(L1, 0, 1, -INFINITY);
   gsl_matrix_set(L2, 0, 1, -INFINITY);
   gsl_matrix_set(L4, 0, 1, -INFINITY);
@@ -61,8 +61,8 @@ double TKF92LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
   gsl_matrix_set(L6, 0, 1, -INFINITY);
   temp = 0;
   for(j = 2; j <= SB; j++){
-    temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + log(r) + log1x(lambda/r*beta*(1-r));
-    gsl_matrix_set(L3, 0, j, log1x(-lambda/mu) + lP22t + log1x(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])) + temp);
+    temp = temp + log(gsl_vector_get(eqFrequencies, seq2Int[j-1])) + log(r) + gsl_log1p(lambda/r*beta*(1-r));
+    gsl_matrix_set(L3, 0, j, gsl_log1p(-lambda/mu) + lP22t + gsl_log1p(-r) + log(gsl_vector_get(eqFrequencies, seq2Int[0])) + temp);
     gsl_matrix_set(L1, 0, j, -INFINITY);
     gsl_matrix_set(L2, 0, j, -INFINITY);
     gsl_matrix_set(L4, 0, j, -INFINITY);
