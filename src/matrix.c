@@ -67,7 +67,7 @@ void asDiagonalComplex(const gsl_vector_complex *X, gsl_matrix_complex *mat){
  * *****************************************************************/
 void create_identity_matrix(gsl_matrix_complex *I){
   int i,j;
-  int nrow;
+  int nrow = I->size1;
   for(i = 0; i < nrow; i++){
     for(j = 0;j < nrow; j++){
       if(i == j){
