@@ -88,6 +88,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   \code{\link{GONNET}}, \code{\link{GONNETBF}}
 }
 \examples{
+  \donttest{
   data(GONNET)
   data(GONNETBF)
   library(seqinr)
@@ -106,6 +107,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   seq2 <- fasta[[2]]
   TKF92Pair(seq1, seq2, mu=0.0006137344, r=0.7016089061,
             substModel=GONNET, substModelBF=GONNETBF)
+  }
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
