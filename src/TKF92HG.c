@@ -296,14 +296,15 @@ double TKF92HGLikelihoodFunction1D(double distance, void *params){
   gsl_matrix *substModelS = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
   gsl_matrix *substModelF = gsl_matrix_alloc(p->substModel->size1, p->substModel->size2);
   PAMn(p->substModel, distance, substModelS);
-  PAMn(p->substModel, distance * kf, substModelF)
+  PAMn(p->substModel, distance * kf, substModelF);
   gsl_vector *eqFrequencies = p->eqFrequencies;
   int *seq1Int = p->seq1Int;
   int *seq2Int = p->seq2Int;
   int SA = p->SA;
   int SB = p->SB;
   double likelihood;
-  likelihood = TKF92LikelihoodFunction(seq1Int, seq2Int, len, mu, r, distance, 
+  likelihood = TKF92HGLikelihoodFunction(seq1Int, seq2Int, len, 
+      mu, r, ps, kf, distance, 
       substModelS, substModelF, eqFrequencies, SA, SB);
  
   // free the allocated matrix

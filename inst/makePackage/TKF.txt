@@ -2,7 +2,8 @@ gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-conf
 gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c matrix.c -o matrix.o
 gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF91.c -o TKF91.o
 gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF92.c -o TKF92.o
-gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o  TKF91.o TKF92.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
+gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF92HG.c -o TKF92HG.o
+gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o TKF92HG.o TKF91.o TKF92.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
 R CMD BUILD  TKF
 R CMD INSTALL TKF_0.0.3.tar.gz
@@ -41,7 +42,9 @@ dyn.load("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/src/TKF.so")
 ## Read fasta
 library(seqinr)
 library(numDeriv)
-fasta <- read.fasta(file="/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/inst/TestData/pair1.fasta" , seqtype="AA", set.attributes=FALSE)
+fasta <- read.fasta(file.path(system.file("extdata", package="TKF"),
+                      "pair1.fasta"),
+                      seqtype="AA", set.attributes=FALSE)
 seq1 <- fasta[[1]]
 seq2 <- fasta[[2]]
 seq1Int <- AAToInt(seq1)
@@ -49,6 +52,10 @@ seq2Int <- AAToInt(seq2)
 ## for the C matrix index
 seq1Int <- seq1Int - 1L
 seq2Int <- seq2Int - 1L
+
+## TKF92HG
+ans <- .Call("TKF92HGLikelihoodFunction5DMainNM", seq1Int, seq2Int, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
+
 
 ## 1D
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
