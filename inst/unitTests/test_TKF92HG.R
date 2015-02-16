@@ -10,7 +10,7 @@ test_TKF92HG <- function(){
   ## 1D estimation: only distance
   seq1 <- fasta[[1]]
   seq2 <- fasta[[2]]
-  ans <- TKF92HGPair(seq1, seq2, mu=5.920655e-04, r=0.8, ps=1, kf=1.2,
+  ans <- TKF92HGPair(seq1, seq2, mu=5.920655e-04, r=0.8, Ps=1, Kf=1.2,
                    substModel=GONNET, substModelBF=GONNETBF)
   checkEqualsNumeric(119.3832517, ans["PAM"], tolerance=1e-3)
 

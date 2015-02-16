@@ -11,7 +11,7 @@
   An additional simple model of regional heterogeneity of substitution rates is used.
 }
 \usage{
-TKF92HG(fasta, mu=NULL, r=NULL, Ps=NULL, Kf=NULl, expectedLength=362, 
+TKF92HG(fasta, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, expectedLength=362, 
         substModel, substModelBF)
 TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
             expectedLength=362, substModel, substModelBF)
@@ -116,7 +116,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
                       "pair1.fasta"),
                       seqtype="AA", set.attributes=FALSE)
   ## 1D estimation: only distance
-  TKF92HG(fasta, mu=5.920655e-04, r=0.8, ps=1, kf=1.2,
+  TKF92HG(fasta, mu=5.920655e-04, r=0.8, Ps=1, Kf=1.2,
           substModel=GONNET, substModelBF=GONNETBF)
   
   ## 2D estimation: joint estimation of distance, mu and r
@@ -125,7 +125,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   ## only apply to a pair of sequences
   seq1 <- fasta[[1]]
   seq2 <- fasta[[2]]
-  TKF92HGPair(seq1, seq2, mu=5.920655e-04, r=0.8, ps=1, kf=1.2,
+  TKF92HGPair(seq1, seq2, mu=5.920655e-04, r=0.8, Ps=1, Kf=1.2,
             substModel=GONNET, substModelBF=GONNETBF)
   }
 }

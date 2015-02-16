@@ -19,7 +19,10 @@ export(
   TKF91Pair, TKF91,
 
   ## TKF92.R
-  TKF92Pair, TKF92
+  TKF92Pair, TKF92,
+
+  ## TKF92HG.R
+  TKF92HGPair,  TKF92HG
   )
 
 

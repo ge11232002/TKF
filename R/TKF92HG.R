@@ -57,7 +57,7 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                  substModel=substModel, 
                  substModelBF=substModelBF)
     return(c(ans, "PAMVariance"=solve(ansHessian)[1,1]))
-  }else if(!is.null(mu) && !is.null(distance) && !is.null(r) && !is.null(Ps) && !is.null(kf)){
+  }else if(!is.null(mu) && !is.null(distance) && !is.null(r) && !is.null(Ps) && !is.null(Kf)){
     ## Just calculate the likelihood, given mu and distance, r, Ps, Kf
     ans <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, 
                  distance, mu, r, Ps, Kf, expectedLength, substModel, substModelBF)
