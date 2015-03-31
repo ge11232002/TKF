@@ -7,8 +7,8 @@ gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -sing
 
 R CMD BUILD  TKF
 R CMD build  TKF
-R CMD INSTALL TKF_0.0.4.tar.gz
-R CMD check --as-cran TKF_0.0.4.tar.gz
+R CMD INSTALL TKF_0.0.5.tar.gz
+R CMD check --as-cran TKF_0.0.5.tar.gz
 
 
 ## Linux
