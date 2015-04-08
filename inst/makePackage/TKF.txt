@@ -99,3 +99,16 @@ temp = Hilbert(4)
 foo = eigen(temp, symmetric=FALSE)
 matrix(as.numeric(foo$vectors), ncol=20) %*% diag(log(as.numeric(foo$values)), 20,20) %*% ginv(matrix(as.numeric(foo$vectors), ncol=20))
 
+## wls
+Dist <- read.table("/Users/gtan/Downloads/p2710.distanceMatrix", header=TRUE, sep="\t")
+rownames(Dist) <- colnames(Dist)
+Dist <- as.matrix(Dist)
+Var = Dist/10
+tree = optim.phylo.ls(Dist)
+plot(tree, type="unrooted")
+
+AX=Y
+t(A)AX=solve(t(A)A) t(A)Y
+
+foo=as.data.frame(cbind(X, colDist))
+lm(colDist~0+a+b+c+d+e+f+g+h+i, data=foo)

@@ -4,6 +4,10 @@ import(methods)
 ### Import ordinary functions from other packages
 importFrom(expm, expm.Higham08, logm)
 importFrom(numDeriv, hessian)
+importFrom(phytools, optim.phylo.ls, phyloDesign)
+importFrom(ape, rtree, multi2di, di2multi, is.binary.treei, is.rooted, unroot)
+importFrom(phangorn, nni)
+
 
 ### -----------------------------------------------------------------
 ### Export non-generic functions
