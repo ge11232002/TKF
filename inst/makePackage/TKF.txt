@@ -6,7 +6,7 @@ gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-conf
 gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o TKF92HG.o TKF91.o TKF92.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
 R CMD build  TKF
-R CMD INSTALL TKF_0.0.5.tar.gz
+R CMD INSTALL TKF_0.0.6.tar.gz
 R CMD check --as-cran TKF_0.0.5.tar.gz
 
 
@@ -103,12 +103,9 @@ matrix(as.numeric(foo$vectors), ncol=20) %*% diag(log(as.numeric(foo$values)), 2
 Dist <- read.table("/Users/gtan/Downloads/p2710.distanceMatrix", header=TRUE, sep="\t")
 rownames(Dist) <- colnames(Dist)
 Dist <- as.matrix(Dist)
-Var = Dist/10
-tree = optim.phylo.ls(Dist)
+Var = read.table("/Users/gtan/Downloads/p2710.varianceMatrix", header=TRUE, sep="\t")
+rownames(Var) <- colnames(Var)
+Var <- as.matrix(Var)
+tree = optim.phylo.wls(Dist, Var)
 plot(tree, type="unrooted")
 
-AX=Y
-t(A)AX=solve(t(A)A) t(A)Y
-
-foo=as.data.frame(cbind(X, colDist))
-lm(colDist~0+a+b+c+d+e+f+g+h+i, data=foo)

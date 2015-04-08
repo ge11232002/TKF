@@ -5,7 +5,7 @@ import(methods)
 importFrom(expm, expm.Higham08, logm)
 importFrom(numDeriv, hessian)
 importFrom(phytools, optim.phylo.ls, phyloDesign)
-importFrom(ape, rtree, multi2di, di2multi, is.binary.treei, is.rooted, unroot)
+importFrom(ape, rtree, multi2di, di2multi, is.binary.tree, is.rooted, unroot)
 importFrom(phangorn, nni)
 
 
@@ -18,6 +18,9 @@ export(
   PAMn,
   AAToInt,
   AACharacterSet,
+
+  ## MinSqTree.R
+  optim.phylo.wls,
 
   ## TKF91.R
   TKF91Pair, TKF91,

@@ -40,7 +40,7 @@ optim.phylo.wls <- function(Dist, Var=NULL, stree=NULL, set.neg.to.zero=TRUE,
 
   if(!is(stree, "phylo")){
     message("random starting tree if stree is not phylo class!")
-    stree <- rtree(n=n, tip.label=rownames(D), br=NULL, rooted=FALSE)
+    stree <- rtree(n=n, tip.label=rownames(Dist), br=NULL, rooted=FALSE)
   }
 
   if(!is.binary.tree(stree)){
