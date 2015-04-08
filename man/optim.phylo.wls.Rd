@@ -23,12 +23,12 @@ optim.phylo.wls(Dist, Var=NULL, stree=NULL, set.neg.to.zero=TRUE,
   \item{stree}{
   an optional starting tree for the optimization.
   }
-  \item{set.neg.to.zero}
-  a logical value indicating whether to set negative branch lengths to zero (default ‘TRUE’).
+  \item{set.neg.to.zero}{
+  a logical value indicating whether to set negative branch lengths to zero (default "TRUE").
   }
   \item{fixed}{
   a logical value indicating whether to estimate the topology -
-          if ‘TRUE’ only the branch lengths will be computed.
+          if "TRUE" only the branch lengths will be computed.
   }
   \item{tol}{
   a tolerance value used to assess whether the optimization has converged.
@@ -45,7 +45,7 @@ For more details, please check the help page of \code{optim.phylo.ls}.
 \value{
 An objec of class "phylo" that (may be) the least-squares tree
      with branch lengths; also returns the sum of squares in
-     ‘attr(tree,"Q-score")’.
+     'attr(tree,"Q-score")'.
 }
 
 \author{
