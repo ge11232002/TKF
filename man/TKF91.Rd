@@ -23,10 +23,9 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   when reading from a fasta file.
   }
   \item{mu}{
-    A \link{numeric} value or NULL.
-    It is the death rate per normal link in TKF91 model.
-    When it is NULL, a joint estimation of \code{mu} and \code{distance} will
-    be done.
+    A \link{numeric} value between 0 and 1 or NULL.  
+    It is the death rate per normal link in TKF91 model.  
+    When it is NULL, a joint estimation of \code{mu} and \code{r} will be done.
     When it is given, only the distance will be estimated.
   }
   \item{distance}{

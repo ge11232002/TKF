@@ -391,6 +391,12 @@ double TKF92HGLikelihoodFunction5D(const gsl_vector *v,  void *params){
   if(gsl_vector_ispos(v) != 1){
     return GSL_POSINF;
   }
+  if(gsl_vector_get(v, 1) >= 1){
+    return GSL_POSINF;
+  }
+  if(gsl_vector_get(v, 2) >= 1){
+    return GSL_POSINF;
+  }
   double distance, mu, r, ps, kf;
   struct TKF92HGLikelihoodFunction5D_params *p = (struct TKF92HGLikelihoodFunction5D_params *) params;
   double len = p->len;

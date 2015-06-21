@@ -155,6 +155,10 @@ SEXP TKF91LikelihoodFunctionWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR
 
 double TKF91LikelihoodFunction2D(const gsl_vector *v,  void *params){
   if(gsl_vector_ispos(v) != 1){
+    //There must be better to prevent the negative parameters.
+    return GSL_POSINF;
+  }
+  if(gsl_vector_get(v, 1) >= 1){
     return GSL_POSINF;
   }
   double distance, mu;

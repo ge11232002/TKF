@@ -5,9 +5,9 @@ gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-conf
 gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF92HG.c -o TKF92HG.o
 gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o TKF92HG.o TKF91.o TKF92.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
 
-R CMD build  TKF
-R CMD INSTALL TKF_0.0.7.tar.gz
-R CMD check --run-donttest --as-cran TKF_0.0.7.tar.gz
+R_stable CMD build  TKF
+R_stable CMD INSTALL TKF_0.0.8.tar.gz
+R_stable CMD check --run-donttest --as-cran TKF_0.0.8.tar.gz
 
 
 ## Linux
