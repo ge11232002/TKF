@@ -415,9 +415,12 @@ SEXP TKF91LikelihoodFunction2DMain(SEXP seq1IntR, SEXP seq2IntR,
         );
   }
   while(status == GSL_CONTINUE && iter < max_iter);
+
   gsl_vector_free(x);
   //gsl_vector_free(ss);
   gsl_multimin_fdfminimizer_free(s);
+  gsl_vector_free(eqFrequencies);
+  gsl_matrix_free(probMat);
 
   return R_NilValue;
 }
@@ -527,6 +530,8 @@ SEXP TKF91LikelihoodFunction2DMainNM(SEXP seq1IntR, SEXP seq2IntR,
   gsl_vector_free(x);
   gsl_vector_free(ss);
   gsl_multimin_fminimizer_free(s);
+  gsl_vector_free(eqFrequencies);
+  gsl_matrix_free(probMat);
 
   UNPROTECT(2);
   return ans;
