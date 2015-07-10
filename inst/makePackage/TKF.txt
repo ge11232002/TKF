@@ -1,47 +1,30 @@
-gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c MathFunctions.c -o MathFunctions.o
-gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c matrix.c -o matrix.o
-gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF91.c -o TKF91.o
-gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF92.c -o TKF92.o
-gcc -I/Users/gtan/src/R-devel/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -fPIC  -g -O2  -c TKF92HG.c -o TKF92HG.o
-gcc -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o TKF.so MathFunctions.o  matrix.o TKF92HG.o TKF91.o TKF92.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/Users/gtan/src/R-devel/lib -lR -Wl,-framework -Wl,CoreFoundation
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c MathFunctions.c -o MathFunctions.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c R_init_TKF.c -o R_init_TKF.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF91.c -o TKF91.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF92.c -o TKF92.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF92HG.c -o TKF92HG.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c matrix.c -o matrix.o
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF91_nlopt.c -o TKF91_nlopt.o
+clang -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/lib -L/usr/local/opt/gettext/lib -L/usr/local/opt/readline/lib -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF92.o TKF92HG.o matrix.o TKF91_nlopt.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -lnlopt_cxx -lm -F/usr/local/Cellar/r/3.2.1_1/R.framework/.. -framework R -lintl -Wl,-framework -Wl,CoreFoundation
 
 R_stable CMD build  TKF
 R_stable CMD INSTALL TKF_0.0.8.tar.gz
 R_stable CMD check --run-donttest --as-cran TKF_0.0.8.tar.gz
 
 
-## Linux
-gcc -std=gnu99 -I/mnt/biggles/opt/R/R-3.1.2/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fpic  -g -O2  -c MathFunctions.c -o MathFunctions.o
-gcc -std=gnu99 -I/mnt/biggles/opt/R/R-3.1.2/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fpic  -g -O2  -c R_init_TKF.c -o R_init_TKF.o
-gcc -std=gnu99 -I/mnt/biggles/opt/R/R-3.1.2/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fpic  -g -O2  -c matrix.c -o matrix.o
-gcc -std=gnu99 -I/mnt/biggles/opt/R/R-3.1.2/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fpic  -g -O2  -c TKF91.c -o TKF91.o
-gcc -std=gnu99 -I/mnt/biggles/opt/R/R-3.1.2/include -DNDEBUG  -I/usr/local/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fpic  -g -O2  -c TKF92.c -o TKF92.o
-gcc -std=gnu99 -shared -L/usr/local/lib64 -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF92.o matrix.o -L/usr/local/lib -lgsl -lgslcblas -lm
-
-R_stable CMD build  TKF
-R_stable CMD install TKF_0.0.2.tar.gz
-R_stable CMD check --as-cran TKF_0.0.2.tar.gz
-
 ### Mac
-source("/Users/gtan/Repositories/Bitbucket/TKF/R/ScoringMatrix.R")
-source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF91.R")
-source("/Users/gtan/Repositories/Bitbucket/TKF/R/TKF92.R")
-load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNET.rda")
-load("/Users/gtan/Repositories/Bitbucket/TKF/data/GONNETBF.rda")
-dyn.load("/Users/gtan/Repositories/Bitbucket/TKF/src/TKF.so")
-
-### Linux
-source("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/R/ScoringMatrix.R")
-source("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/R/TKF91.R")
-source("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/R/TKF92.R")
-load("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/data/GONNET.rda")
-load("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/data/GONNETBF.rda")
-dyn.load("/mnt/biggley/home/gtan/Repos/Bitbucket/TKF/src/TKF.so")
+source("/Users/gtan/Repos/Bitbucket/TKF/R/ScoringMatrix.R")
+source("/Users/gtan/Repos/Bitbucket/TKF/R/TKF91.R")
+source("/Users/gtan/Repos/Bitbucket/TKF/R/TKF92.R")
+load("/Users/gtan/Repos/Bitbucket/TKF/data/GONNET.rda")
+load("/Users/gtan/Repos/Bitbucket/TKF/data/GONNETBF.rda")
+dyn.load("/Users/gtan/Repos/Bitbucket/TKF/src/TKF.so")
 
 
 ## Read fasta
 library(seqinr)
 library(numDeriv)
+library(TKF)
 fasta <- read.fasta(file.path(system.file("extdata", package="TKF"),
                       "pair1.fasta"),
                       seqtype="AA", set.attributes=FALSE)
@@ -58,13 +41,15 @@ ans <- .Call("TKF92HGLikelihoodFunction5DMainNM", seq1Int, seq2Int, expectedLeng
 ans <- .Call("TKF92HGLikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04, r=0.8, ps=1, kf=1.2, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
 ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04, r=0.8, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
 
-
+# TKF91
 ## 1D
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 TKF91(fasta, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 ## 2D
 TKF91Pair(seq1, seq2, substModel=GONNET, substModelBF=GONNETBF)
 TKF91(fasta)
+ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int, 362, GONNET, GONNETBF)
+
 ## pure likelihood
 TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
 
