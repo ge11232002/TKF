@@ -14,6 +14,7 @@
 #include "Rdefines.h"
 #include "Rinternals.h"
 #include <R_ext/Rdynload.h>
+#include <R_ext/Utils.h> // For R_CheckUserInterrupt
 #include "matrix.h"
 #include "MathFunctions.h"
 

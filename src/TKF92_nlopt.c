@@ -2,6 +2,7 @@
 
 double TKF92LikelihoodFunction3D_nlopt(unsigned n, const double* x,
     double* grad, void* params){
+  R_CheckUserInterrupt();
   gsl_vector *x_opt = gsl_vector_alloc(3);
   gsl_vector_set(x_opt, 0, x[0]); // The distance
   gsl_vector_set(x_opt, 1, x[1]); // The mu
@@ -58,7 +59,7 @@ SEXP TKF92LikelihoodFunction3DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
   // nlopt main procedure
   double lb[3] = {0.0494497, 1e-20, 1e-20}; // lower bounds
   double ub[3] = {2000, 1-1e-20, 1-1e-20};  // upper bounds
-  double dx[3] = {1, 0.01, 0.1}; // The initial step size
+  //double dx[3] = {20, 0.01, 0.1}; // The initial step size
 
   nlopt_opt opt;
   if(strcmp(CHAR(STRING_ELT(method, 0)), "NM") == 0){
@@ -80,7 +81,7 @@ SEXP TKF92LikelihoodFunction3DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
   
   nlopt_set_min_objective(opt, TKF92LikelihoodFunction3D_nlopt, &params);
   nlopt_set_ftol_rel(opt, F_TOL); // stopping criteria
-  nlopt_set_initial_step(opt, dx); // initial step size
+  //nlopt_set_initial_step(opt, dx); // initial step size
 
   double x[3] = {100, exp(-3), 0.5};  /* some initial guess */
   double minf; /* the minimum objective value, upon return */

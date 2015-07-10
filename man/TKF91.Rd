@@ -41,6 +41,8 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
     "all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
     When it is "all", it will choose the best algorithm based on 
     the minimal negative log-likelihood.
+    
+    This argument is ignored when only distance is being estimated.
   }
   \item{expectedLength}{
     A \link{numeric} object: the expected length of input protein sequences.
@@ -65,7 +67,7 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   Currently this implementation only supports the normal 20 AAs.
   Missing or Ambiguous characters are not supported.
   
-  The 2D optimisation algorithms are from the implementation of "nlopt".
+  The 2D optimisation are based on the library "nlopt".
   More details regarding the algorithms, please go to 
   \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
 }
