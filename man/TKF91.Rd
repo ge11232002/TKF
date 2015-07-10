@@ -10,9 +10,12 @@
   from protein sequences.
 }
 \usage{
-TKF91(fasta, mu=NULL, expectedLength=362, 
+TKF91(fasta, mu=NULL, 
+      method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+      expectedLength=362, 
       substModel, substModelBF)
 TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
+          method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
           expectedLength=362, substModel, substModelBF)
 }
 
@@ -31,6 +34,13 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   \item{distance}{
     A \link{numeric} value: the PAM distance between two protein sequences.
     When it is given, TKF91Pair only calculates the negative log-likelihood.
+  }
+  \item{method}{
+    When mu and distance are co-estimated,
+    the optimisation method can be one of 
+    "all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
+    When it is "all", it will choose the best algorithm based on 
+    the minimal negative log-likelihood.
   }
   \item{expectedLength}{
     A \link{numeric} object: the expected length of input protein sequences.
@@ -54,6 +64,10 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
 \details{
   Currently this implementation only supports the normal 20 AAs.
   Missing or Ambiguous characters are not supported.
+  
+  The 2D optimisation algorithms are from the implementation of "nlopt".
+  More details regarding the algorithms, please go to 
+  \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
 }
 
 \value{
@@ -89,7 +103,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   TKF91(fasta, mu=5.920655e-04, 
         substModel=GONNET, substModelBF=GONNETBF)
   ## 2D estimation: joint estimation of distance and mu
-  TKF91(fasta, substModel=GONNET, substModelBF=GONNETBF)
+  TKF91(fasta, substModel=GONNET, substModelBF=GONNETBF, method="NM")
   ## only apply to a pair of sequences
   seq1 <- fasta[[1]]
   seq2 <- fasta[[2]]

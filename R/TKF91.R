@@ -84,8 +84,12 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
 }
 
 
-TKF91 <- function(fasta, mu=NULL, method="NM", expectedLength=362, 
+TKF91 <- function(fasta, mu=NULL, 
+                  method=c("all", "NM", "Sbplx", "COBYLA", 
+                           "BOBYQA", "PRAXIS"),
+                  expectedLength=362, 
                   substModel, substModelBF){
+  method <- match.arg(method)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
   distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
