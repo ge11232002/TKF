@@ -57,6 +57,7 @@ SEXP TKF91LikelihoodFunction2DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
   // nlopt main procedure
   double lb[2] = {0.0494497, 1e-20}; // lower bounds
   double ub[2] = {2000, 1-1e-20};    // upper bounds
+  double dx[2] = {1, 0.01}; // The initial step size
 
   nlopt_opt opt;
   if(strcmp(CHAR(STRING_ELT(method, 0)), "NM") == 0){
@@ -77,6 +78,7 @@ SEXP TKF91LikelihoodFunction2DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
   
   nlopt_set_min_objective(opt, TKF91LikelihoodFunction2D_nlopt, &params);
   nlopt_set_ftol_rel(opt, F_TOL); // stopping criteria
+  nlopt_set_initial_step(opt, dx); // initial step size
 
   double x[2] = {100, exp(-3)};  /* some initial guess */
   double minf; /* the minimum objective value, upon return */

@@ -4,12 +4,17 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                       ## r: the probability in the geometric distribution 
                       ## of fragment length. By default, it should be 0.8480
                       ## from median of r values of Fungi dataset.
-                  expectedLength=362, 
-                  substModel, substModelBF){
+                      method=c("all", "NM", "Sbplx", "COBYLA",
+                               "BOBYQA", "PRAXIS"),
+                      expectedLength=362, 
+                      substModel, substModelBF){
   if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
     stop("This implementation currently only supports 20 AA characters ",
          paste(AACharacterSet, collapse=" "))
   }
+  method <- match.arg(method)
+  methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
+
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
   ## for the C matrix index
@@ -20,8 +25,20 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance) && is.null(r)){ 
     ## Do the 3D optimisation
-    ans <- .Call("TKF92LikelihoodFunction3DMainNM", seq1Int, seq2Int,
-                 expectedLength, substModel, substModelBF)
+    if(method == "all"){
+      ## We try all the optimisation methods and select the best one
+      ans_all <- lapply(methodsOpt,
+                        function(x){.Call("TKF92LikelihoodFunction3DMain_nlopt",
+                                          seq1Int, seq2Int, 
+                                          expectedLength, 
+                                          substModel, substModelBF,
+                                          x)}
+                        )
+      ans <- ans_all[[which.min(sapply(ans <- all, "[", "negLogLikelihood"))]]
+    }else{
+      ans <- .Call("TKF92LikelihoodFunction3DMain_nlopt", seq1Int, seq2Int,
+                   expectedLength, substModel, substModelBF, method)
+    }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
                           ansTemp <- .Call("TKF92LikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], x[3], expectedLength, substModel, substModelBF)
                           return(ansTemp["negLogLikelihood"])

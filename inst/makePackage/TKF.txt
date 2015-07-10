@@ -5,7 +5,8 @@ clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/u
 clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF92HG.c -o TKF92HG.o
 clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c matrix.c -o matrix.o
 clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF91_nlopt.c -o TKF91_nlopt.o
-clang -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/lib -L/usr/local/opt/gettext/lib -L/usr/local/opt/readline/lib -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF92.o TKF92HG.o matrix.o TKF91_nlopt.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -lnlopt_cxx -lm -F/usr/local/Cellar/r/3.2.1_1/R.framework/.. -framework R -lintl -Wl,-framework -Wl,CoreFoundation
+clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include   `gsl-config --cflags` -DR_DIRICHLETMULTINOMIAL -fPIC  -g -O2  -c TKF92_nlopt.c -o TKF92_nlopt.o
+clang -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/lib -L/usr/local/opt/gettext/lib -L/usr/local/opt/readline/lib -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF92.o TKF92HG.o matrix.o TKF91_nlopt.o TKF92_nlopt.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -lnlopt_cxx -lm -F/usr/local/Cellar/r/3.2.1_1/R.framework/.. -framework R -lintl -Wl,-framework -Wl,CoreFoundation
 
 R_stable CMD build  TKF
 R_stable CMD INSTALL TKF_0.0.8.tar.gz
@@ -59,7 +60,7 @@ TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNE
 expectedLength=362
 substModel=GONNET
 substModelBF=GONNETBF
-ans <- TKF92Pair(seq1, seq2, expectedLength=362, substModel=GONNET, substModelBF=GONNETBF)
+ans <- TKF92Pair(seq1, seq2, expectedLength=362, substModel=GONNET, substModelBF=GONNETBF, method="NM")
 
 ## TKF92 1D
 ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04, r=0.8, expectedLength=362, substModel=GONNET, substModelBF= GONNETBF)
