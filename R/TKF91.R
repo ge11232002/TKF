@@ -6,13 +6,18 @@
 #########################################################################
 
 TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
-                  ## mu: by default is 0.001 from median of mu values from Fungi dataset.
-                  expectedLength=362, 
-                  substModel, substModelBF){
+                      ## mu: by default is 0.001 from median of mu values 
+                      ## from Fungi dataset.
+                      method=c("all", "NM", "Sbplx", "COBYLA", 
+                               "BOBYQA", "PRAXIS"),
+                      expectedLength=362, 
+                      substModel, substModelBF){
   if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
     stop("This implementation currently only supports 20 AA characters ", 
          paste(AACharacterSet, collapse=" "))
   }
+  method <- match.arg(method)
+  methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
   ## for the C matrix index
@@ -23,8 +28,19 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance)){ 
     ## Do the 2D optimisation
-    ans <- .Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int,
-                 expectedLength, substModel, substModelBF)
+    if(method == "all"){
+      ## We try all the optimisation methods and select the best one
+      ans_all <- lapply(methodsOpt, 
+                        function(x){.Call("TKF91LikelihoodFunction2DMain_nlopt",
+                                          seq1Int, seq2Int, expectedLength, 
+                                          substModel, substModelBF, x)}
+                        )
+      ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
+
+    }else{
+      ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int,
+                   expectedLength, substModel, substModelBF, method)
+    }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
                           ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], expectedLength, substModel, substModelBF)
                           return(ansTemp["negLogLikelihood"])
@@ -68,7 +84,7 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
 }
 
 
-TKF91 <- function(fasta, mu=NULL, expectedLength=362, 
+TKF91 <- function(fasta, mu=NULL, method="NM", expectedLength=362, 
                   substModel, substModelBF){
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
@@ -83,7 +99,7 @@ TKF91 <- function(fasta, mu=NULL, expectedLength=362,
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
       ans <- TKF91Pair(fasta[[i]], fasta[[j]], 
-                       mu=mu, expectedLength=expectedLength,
+                       mu=mu, method=method, expectedLength=expectedLength,
                        substModel=substModel, substModelBF=substModelBF)
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]

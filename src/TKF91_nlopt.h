@@ -9,6 +9,7 @@ double TKF91LikelihoodFunction2D_nlopt(unsigned n, const double* x,
 
 /**** TKF91 with nlopt implementation ****/
 SEXP TKF91LikelihoodFunction2DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
-    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR);
+    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR,
+    SEXP method);
 
 

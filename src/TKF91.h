@@ -29,11 +29,11 @@
 
 struct TKF91LikelihoodFunction1D_params
 {
-      double len, mu;
-      gsl_matrix *substModel;
-      gsl_vector *eqFrequencies;
-      int *seq1Int, *seq2Int;
-      int SA, SB;
+  double len, mu;
+  gsl_matrix *substModel;
+  gsl_vector *eqFrequencies;
+  int *seq1Int, *seq2Int;
+  int SA, SB;
 };
 
 struct TKF91LikelihoodFunction2D_params

@@ -14,7 +14,8 @@ double TKF91LikelihoodFunction2D_nlopt(unsigned n, const double* x,
  * nlopt main functions
  * *****************************************************************/
 SEXP TKF91LikelihoodFunction2DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
-    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR){
+    SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR,
+    SEXP method){
   int ncol, nrow;
   ncol = INTEGER(GET_DIM(probMatR))[1];
   nrow = INTEGER(GET_DIM(probMatR))[0];
@@ -58,26 +59,51 @@ SEXP TKF91LikelihoodFunction2DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
   double ub[2] = {2000, 1-1e-20};    // upper bounds
 
   nlopt_opt opt;
-  opt = nlopt_create(NLOPT_LN_NELDERMEAD, 2); /* algorithm and dimensionality */
+  if(strcmp(CHAR(STRING_ELT(method, 0)), "NM") == 0){
+    opt = nlopt_create(NLOPT_LN_NELDERMEAD, 2); /* algorithm and dimensionality */
+  }else if(strcmp(CHAR(STRING_ELT(method, 0)), "Sbplx") == 0){
+    opt = nlopt_create(NLOPT_LN_SBPLX, 2);
+  }else if(strcmp(CHAR(STRING_ELT(method, 0)), "COBYLA") == 0){
+    opt = nlopt_create(NLOPT_LN_COBYLA, 2);
+  }else if(strcmp(CHAR(STRING_ELT(method, 0)), "BOBYQA") == 0){
+    opt = nlopt_create(NLOPT_LN_BOBYQA, 2);
+  }else if(strcmp(CHAR(STRING_ELT(method, 0)), "PRAXIS") == 0){
+    opt = nlopt_create(NLOPT_LN_PRAXIS, 2);
+  }else{
+    error("Wrong optimisation method!");
+  }
   nlopt_set_lower_bounds(opt, lb);
   nlopt_set_upper_bounds(opt, ub);
   
   nlopt_set_min_objective(opt, TKF91LikelihoodFunction2D_nlopt, &params);
-  nlopt_set_ftol_rel(opt, 1e-9); // stopping criteria
+  nlopt_set_ftol_rel(opt, F_TOL); // stopping criteria
 
   double x[2] = {100, exp(-3)};  /* some initial guess */
   double minf; /* the minimum objective value, upon return */
   if (nlopt_optimize(opt, x, &minf) < 0) {
-    printf("nlopt failed!\n");
+    Rprintf("nlopt failed!\n");
   }else{
-    printf("found minimum at f(%g,%g) = %0.10g\n", x[0], x[1], minf);
+    Rprintf("found minimum at f(%g,%g) = %0.10g using %s algorithm\n", 
+        x[0], x[1], minf, CHAR(STRING_ELT(method, 0)));
   }
+
+  SEXP ans, ansNames;
+  PROTECT(ans = NEW_NUMERIC(3)); // a vector of distance, mu and the negative log likelihood
+  PROTECT(ansNames = NEW_CHARACTER(3));
+  REAL(ans)[0] = x[0];
+  REAL(ans)[1] = x[1];
+  REAL(ans)[2] = minf;
+  SET_STRING_ELT(ansNames, 0, mkChar("PAM"));
+  SET_STRING_ELT(ansNames, 1, mkChar("Mu"));
+  SET_STRING_ELT(ansNames, 2, mkChar("negLogLikelihood"));
+  SET_NAMES(ans, ansNames);
 
   // free everything
   nlopt_destroy(opt);
   gsl_vector_free(eqFrequencies);
   gsl_matrix_free(probMat);
 
-  return R_NilValue;
+  UNPROTECT(2);
+  return ans;
 }
 

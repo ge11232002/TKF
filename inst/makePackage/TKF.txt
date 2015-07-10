@@ -46,9 +46,9 @@ ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu=5.920655e-04,
 TKF91Pair(seq1, seq2, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 TKF91(fasta, mu=5.920655e-04, substModel=GONNET, substModelBF=GONNETBF)
 ## 2D
-TKF91Pair(seq1, seq2, substModel=GONNET, substModelBF=GONNETBF)
+TKF91Pair(seq1, seq2, substModel=GONNET, substModelBF=GONNETBF, method="NM")
 TKF91(fasta)
-ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int, 362, GONNET, GONNETBF)
+ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int, 362, GONNET, GONNETBF, "NM")
 
 ## pure likelihood
 TKF91Pair(seq1, seq2, mu=5.920655e-04, distance=116.3784767530, substModel=GONNET, substModelBF=GONNETBF)
