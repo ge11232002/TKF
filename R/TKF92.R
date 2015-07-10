@@ -91,8 +91,12 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   }
 }
 
-TKF92 <- function(fasta, mu=NULL, r=NULL, expectedLength=362,
+TKF92 <- function(fasta, mu=NULL, r=NULL, 
+                  method=c("all", "NM", "Sbplx", "COBYLA",
+                           "BOBYQA", "PRAXIS"),
+                  expectedLength=362,
                   substModel, substModelBF){
+  method <- match.arg(method)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
   distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
@@ -107,7 +111,7 @@ TKF92 <- function(fasta, mu=NULL, r=NULL, expectedLength=362,
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
       ans <- TKF92Pair(fasta[[i]], fasta[[j]],
-                       mu=mu, r=r, expectedLength=expectedLength,
+                       mu=mu, r=r, method=method, expectedLength=expectedLength,
                        substModel=substModel, substModelBF=substModelBF)
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]

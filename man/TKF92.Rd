@@ -10,9 +10,12 @@
   from protein sequences.
 }
 \usage{
-TKF92(fasta, mu=NULL, r=NULL, expectedLength=362, 
+TKF92(fasta, mu=NULL, r=NULL, 
+      method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+      expectedLength=362, 
       substModel, substModelBF)
 TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
+          method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
           expectedLength=362, substModel, substModelBF)
 }
 
@@ -41,6 +44,15 @@ TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
     A numeric value: the PAM distance between two protein sequences.
     When it is given, TKF92Pair only calculates the negative log-likelihood.
   }
+  \item{method}{
+    When mu, r and distance are co-estimated,
+    the optimisation method can be one of 
+    "all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
+    When it is "all", it will choose the best algorithm based on 
+    the minimal negative log-likelihood.
+    
+    This argument is ignored when only distance is being estimated.
+  }
   \item{expectedLength}{
     A numeric object: the expected length of input protein sequences.
     By default, the average sequence length, 362, from OMA browser is used.
@@ -63,6 +75,10 @@ TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
 \details{
   Currently this implementation only supports the normal 20 AAs.
   Missing or Ambiguous characters are not supported.
+  
+  The 3D optimisation are based on the library "nlopt".
+  More details regarding the algorithms, please go to 
+  \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
 }
 
 \value{
@@ -98,8 +114,8 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
   TKF92(fasta, mu=0.0006137344, r=0.7016089061,
         substModel=GONNET, substModelBF=GONNETBF)
   
-  ## 2D estimation: joint estimation of distance, mu and r
-  TKF92(fasta, substModel=GONNET, substModelBF=GONNETBF)
+  ## 3D estimation: joint estimation of distance, mu and r
+  TKF92(fasta, substModel=GONNET, substModelBF=GONNETBF, method="NM")
   
   ## only apply to a pair of sequences
   seq1 <- fasta[[1]]
