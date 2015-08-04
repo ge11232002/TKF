@@ -7,9 +7,16 @@
 #include "Rdefines.h"
 #include "Rinternals.h"
 #include <R_ext/Rdynload.h>
+#include <R_ext/Utils.h> // For R_CheckUserInterrupt
 #include "matrix.h"
 #include "MathFunctions.h"
 #include <math.h> // pow
+
+/********************************************************************
+ * Constants regarding the optimisation
+ * *****************************************************************/
+#define MAX_ITER 30000
+#define F_TOL 1e-5   // Relative tolerance on function value
 
 /********************************************************************
  * TKF92HG stuff

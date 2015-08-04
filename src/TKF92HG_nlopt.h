@@ -1,15 +1,14 @@
 #include <nlopt.h>
-#include "TKF92.h"
+#include "TKF92HG.h"
 
 /********************************************************************
- * TKF92 nlopt objective function
+ * TKF92HG nlopt objective function
  * *****************************************************************/
-double TKF92LikelihoodFunction3D_nlopt(unsigned n, const double* x, 
+double TKF92HGLikelihoodFunction5D_nlopt(unsigned n, const double* x,
     double* grad, void* params);
 
-/**** TKF92 with nlopt implementation ****/
-SEXP TKF92LikelihoodFunction3DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
+/**** TKF92HG with nlopt implementation ****/
+SEXP TKF92HGLikelihoodFunction5DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
     SEXP expectedLength, SEXP probMatR, SEXP eqFrequenciesR,
     SEXP method);
-
 
