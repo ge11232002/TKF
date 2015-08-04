@@ -1,5 +1,12 @@
 #include "TKF92HG_nlopt.h"
 
+/********************************************************************
+ * Constants regarding the optimisation
+ * *****************************************************************/
+#define MAX_ITER 30000
+#define F_TOL 1e-5   // Relative tolerance on function value
+
+
 double TKF92HGLikelihoodFunction5D_nlopt(unsigned n, const double* x,
     double* grad, void* params){
   R_CheckUserInterrupt();

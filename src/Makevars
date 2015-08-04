@@ -1,2 +1,2 @@
 PKG_CFLAGS = `gsl-config --cflags`
-PKG_LIBS = `gsl-config --libs -lnlopt -lm`
+PKG_LIBS = `gsl-config --libs` -lnlopt -lm

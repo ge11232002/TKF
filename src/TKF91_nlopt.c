@@ -1,5 +1,12 @@
 #include "TKF91_nlopt.h"
 
+/********************************************************************
+ * Constants regarding the optimisation
+ * *****************************************************************/
+#define MAX_ITER 10000
+#define F_TOL 1e-5   // Relative tolerance on function value
+
+
 double TKF91LikelihoodFunction2D_nlopt(unsigned n, const double* x,
     double* grad, void* params){
   R_CheckUserInterrupt();
