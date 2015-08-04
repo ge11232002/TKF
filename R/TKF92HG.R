@@ -5,12 +5,18 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                       ## r: the probability in the geometric distribution 
                       ## of fragment length. By default, it should be 0.8480
                       ## from median of r values of Fungi dataset.
+                        method=c("all", "NM", "Sbplx", "COBYLA",
+                                 "BOBYQA", "PRAXIS"),
                         expectedLength=362, 
                         substModel, substModelBF){
   if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
     stop("This implementation currently only supports 20 AA characters ",
          paste(AACharacterSet, collapse=" "))
   }
+
+  method <- match.arg(method)
+  methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
+
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
   ## for the C matrix index
@@ -22,8 +28,20 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
   if(is.null(mu) && is.null(distance) && is.null(r) && 
      is.null(Ps) && is.null(Kf)){ 
     ## Do the 5D optimisation
-    ans <- .Call("TKF92HGLikelihoodFunction5DMainNM", seq1Int, seq2Int,
-                 expectedLength, substModel, substModelBF)
+    if(method == "all"){
+      ## We try all the optimisation methods and select the best one
+      ans_all <- lapply(methodsOpt,
+                        function(x){.Call("TKF92HGLikelihoodFunction5DMain_nlopt",
+                                          seq1Int, seq2Int,
+                                          expectedLength,
+                                          substModel, substModelBF,
+                                          x)}
+                        )
+      ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
+    }else{
+      ans <- .Call("TKF92HGLikelihoodFunction5DMain_nlopt", seq1Int, seq2Int,
+                   expectedLength, substModel, substModelBF, method)
+    }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
                           ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], x[3], x[4], x[5], expectedLength, substModel, substModelBF)
                           return(ansTemp["negLogLikelihood"])
@@ -85,30 +103,57 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
 }
 
 TKF92HG <- function(fasta, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
+                    method=c("all", "NM", "Sbplx", "COBYLA",
+                             "BOBYQA", "PRAXIS"),
                     expectedLength=362,
                     substModel, substModelBF){
+  method <- match.arg(method)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
   distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
                            dimnames=list(seqnames, seqnames))
   varianceMatrix <- distanceMatrix
   negLoglikelihoodMatrix <- distanceMatrix
+  if(is.null(mu) && is.null(r) && is.null(Ps) && is.null(Kf)){
+    muMatrix <- distanceMatrix
+    rMatrix <- distanceMatrix
+    PsMatrix <- distanceMatrix
+    KfMatrix <- distanceMatrix
+  }
   for(i in 1:(nSeqs-1L)){
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
       ans <- TKF92HGPair(fasta[[i]], fasta[[j]],
-                         mu=mu, r=r, Ps=Ps, Kf=Kf, 
+                         mu=mu, r=r,  method=method, Ps=Ps, Kf=Kf, 
                          expectedLength=expectedLength,
                          substModel=substModel, substModelBF=substModelBF)
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
       negLoglikelihoodMatrix[i,j] <- negLoglikelihoodMatrix[j,i] <-
         ans["negLogLikelihood"]
+      if(is.null(mu) && is.null(r) && is.null(Ps) && is.null(Kf)){
+        muMatrix[i,j] <- muMatrix[j,i] <- ans["Mu"]
+        rMatrix[i,j] <- rMatrix[j,i] <- ans["r"]
+        PsMatrix[i,j] <- PsMatrix[j,i] <- ans["Ps"]
+        KfMatrix[i,j] <- KfMatrix[j,i] <- ans["Kf"]
+      }
     }
   }
-  return(list(distanceMatrix=distanceMatrix,
-              varianceMatrix=varianceMatrix,
-              negLoglikelihoodMatrix=negLoglikelihoodMatrix))
+  if(is.null(mu) && is.null(r) && is.null(Ps) && is.null(Kf)){
+    return(list(distanceMatrix=distanceMatrix,
+                varianceMatrix=varianceMatrix,
+                muMatrix=muMatrix,
+                rMatrix=rMatrix,
+                PsMatrix=PsMatrix,
+                KfMatrix=KfMatrix,
+                negLoglikelihoodMatrix=negLoglikelihoodMatrix))
+
+  }else{
+     return(list(distanceMatrix=distanceMatrix,
+                 varianceMatrix=varianceMatrix,
+                 negLoglikelihoodMatrix=negLoglikelihoodMatrix))
+  }
+
 }
 
 

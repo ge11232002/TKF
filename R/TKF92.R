@@ -34,7 +34,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                                           substModel, substModelBF,
                                           x)}
                         )
-      ans <- ans_all[[which.min(sapply(ans <- all, "[", "negLogLikelihood"))]]
+      ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
     }else{
       ans <- .Call("TKF92LikelihoodFunction3DMain_nlopt", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF, method)
