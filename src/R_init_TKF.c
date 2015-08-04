@@ -1,8 +1,5 @@
-#include "TKF91.h"
 #include "TKF91_nlopt.h"
-#include "TKF92.h"
 #include "TKF92_nlopt.h"
-#include "TKF92HG.h"
 #include "TKF92HG_nlopt.h"
 
 #define CALLMETHOD_DEF(fun, numArgs) {#fun, (DL_FUNC) &fun, numArgs}
