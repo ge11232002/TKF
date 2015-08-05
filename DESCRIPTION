@@ -5,7 +5,7 @@ Title: Pairwise Distance Estimation with TKF91 and TKF92 Model
 Description: Pairwise evolutionary distance estimation between protein sequences with the TKF91 and TKF92 model, which consider all the possible paths of transforming from one sequence to another.
 Author: Ge Tan <ge.tan09@imperial.ac.uk> 
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>
-Imports: methods, expm, numDeriv, ape (>= 3.2), phytools (>= 0.4-45), phangorn (>= 1.99-12)
+Imports: methods, stats, expm, numDeriv, ape (>= 3.2), phytools (>= 0.4-45), phangorn (>= 1.99-12)
 Depends: R (>= 3.0.2)
 Suggests: RUnit, seqinr
 SystemRequirements: gsl, nlopt
