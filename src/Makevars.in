@@ -1,0 +1,3 @@
+PKG_CFLAGS=@PKG_CFLAGS@ `gsl-config --cflags`
+PKG_LIBS=@PKG_LIBS@ `gsl-config --libs`
+
