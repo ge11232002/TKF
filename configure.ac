@@ -2,7 +2,7 @@
 AC_PREREQ(2.61)
 
 # Process this file with autoconf to produce a configure script.
-AC_INIT([nloptr], [0.1.1])
+AC_INIT([TKF], [0.1.1])
 
 # We are using C
 AC_LANG(C)
