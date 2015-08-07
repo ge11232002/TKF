@@ -1,4 +1,4 @@
 # C Compiler options
-PKG_CFLAGS = -I"$(NLOPT_HOME)$(R_ARCH)/include" `gsl-config --cflags`
-PKG_LIBS = -L"$(NLOPT_HOME)$(R_ARCH)/lib" -lnlopt_cxx `gsl-config --libs`
+PKG_CFLAGS = -I"$(NLOPT_HOME)$(R_ARCH)/include" -I$(LIB_GSL)/include
+PKG_LIBS = -L"$(NLOPT_HOME)$(R_ARCH)/lib" -lnlopt_cxx -L$(LIB_GSL)/lib -lgsl -lgslcblas
 
