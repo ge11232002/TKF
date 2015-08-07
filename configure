@@ -1978,6 +1978,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# The nlopt part is based on the nloptr package
 # We are using C
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3361,7 +3362,7 @@ else
 $as_echo "$as_me: Suitable NLopt library found." >&6;}
 fi
 
-# Checking for GSL
+# The following GSL part is based on the package gsl
 ## Check for non-standard programs: gsl-config(1)
 # Extract the first word of "gsl-config", so it can be a program name with args.
 set dummy gsl-config; ac_word=$2
