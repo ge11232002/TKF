@@ -10,8 +10,8 @@ clang -I/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/include -DNDEBUG  -I/u
 clang -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/Cellar/r/3.2.1_1/R.framework/Resources/lib -L/usr/local/opt/gettext/lib -L/usr/local/opt/readline/lib -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF92.o TKF92HG.o matrix.o TKF91_nlopt.o TKF92_nlopt.o TKF92HG_nlopt.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -lnlopt_cxx -lm -F/usr/local/Cellar/r/3.2.1_1/R.framework/.. -framework R -lintl -Wl,-framework -Wl,CoreFoundation
 
 R_stable CMD build  TKF
-R_stable CMD INSTALL TKF_0.1.1.tar.gz
-R_stable CMD check --run-donttest --as-cran TKF_0.1.1.tar.gz
+R_stable CMD INSTALL TKF_0.1.2.tar.gz
+R_stable CMD check --run-donttest --as-cran TKF_0.1.2.tar.gz
 
 
 ### Mac
