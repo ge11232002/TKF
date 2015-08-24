@@ -61,7 +61,7 @@ Gonnet, G.H., and Scholl, R. (2009). Scientific Computation (Cambridge, UK; New 
   data(GONNET)
   data(GONNETBF)
   ## PAM 250 mutation matrix
-  PAM250 <- PAMn(GONNET, 250)
+  PAM250 <- PAMn(GONNET, 250, method="R")
   
   ## Dayhoff 250 matrix
   Dayhoff250 <- Dayhoffn(GONNET, GONNETBF, 250)
