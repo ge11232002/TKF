@@ -1,5 +1,5 @@
 Package: TKF
-Version: 0.1.5
+Version: 0.1.6
 Date: 2015-08-24
 Title: Pairwise Distance Estimation with TKF91 and TKF92 Model
 Description: Pairwise evolutionary distance estimation between protein sequences with the TKF91 and TKF92 model, which consider all the possible paths of transforming from one sequence to another.
