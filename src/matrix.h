@@ -1,5 +1,5 @@
 /*************************************************************************
-    > File Name: .matrix.h
+    > File Name: matrix.h
     > Author: Ge Tan
     > Mail: gtan@me.com 
     > Created Time: Wed Jul 30 22:57:00 2014
@@ -65,4 +65,6 @@ void gsl_matrix_complex_conjug(gsl_matrix_complex *c,
  * Generate mutation probability matrix for PAM distance from PAM1 matrix
  * *****************************************************************/
 void PAMn(const gsl_matrix *m, const double distance, gsl_matrix *mPAM);
+SEXP PAMnR(SEXP probMatR, SEXP distance);
+
 

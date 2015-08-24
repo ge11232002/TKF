@@ -1,6 +1,7 @@
 #include "TKF91_nlopt.h"
 #include "TKF92_nlopt.h"
 #include "TKF92HG_nlopt.h"
+#include "matrix.h"
 
 #define CALLMETHOD_DEF(fun, numArgs) {#fun, (DL_FUNC) &fun, numArgs}
 
@@ -22,6 +23,9 @@ static const R_CallMethodDef callMethods[] = {
   CALLMETHOD_DEF(TKF92HGLikelihoodFunction1DMain, 9),
   CALLMETHOD_DEF(TKF92HGLikelihoodFunction5DMainNM, 5),
   CALLMETHOD_DEF(TKF92HGLikelihoodFunction5DMain_nlopt, 6),
+
+  /* matrix.c */
+  CALLMETHOD_DEF(PAMnR, 2),
 
   {NULL, NULL, 0}
 };

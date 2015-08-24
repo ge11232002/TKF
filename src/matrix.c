@@ -8,7 +8,6 @@
 #include<stdio.h>
 #include "matrix.h"
 #include "assert.h"
-#include <Rdefines.h>
 
 /*********************************************************************
  * Print a GSL matrix in a proper shape
