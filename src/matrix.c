@@ -8,6 +8,7 @@
 #include<stdio.h>
 #include "matrix.h"
 #include "assert.h"
+#include <Rdefines.h>
 
 /*********************************************************************
  * Print a GSL matrix in a proper shape
@@ -227,5 +228,34 @@ void PAMn(const gsl_matrix *m, const double distance, gsl_matrix *mPAM){
   gsl_matrix_complex_free(mPAMComplex2);
   gsl_matrix_complex_free(evecinv);
   gsl_matrix_free(m2);
+}
+
+/********************************************************************
+ * Entry point: PAMnR
+ * *****************************************************************/
+SEXP PAMnR(SEXP probMatR, SEXP distance){
+  int ncol, nrow;
+  ncol = INTEGER(GET_DIM(probMatR))[1];
+  nrow = INTEGER(GET_DIM(probMatR))[0];
+  int i, j;
+
+  gsl_matrix *probMat = gsl_matrix_alloc(nrow, ncol); 
+  for(i = 0; i < nrow; i++)
+    for(j = 0; j < ncol; j++)
+      gsl_matrix_set(probMat, i, j, REAL(probMatR)[i+j*ncol]);
+  gsl_matrix *substModel = gsl_matrix_alloc(probMat->size1, probMat->size2);
+  PAMn(probMat, REAL(distance)[0], substModel);
+
+  SEXP ans;
+  PROTECT(ans=allocMatrix(REALSXP, nrow, ncol));
+  for(j=0; j<ncol; j++)
+    for(i=0; i<nrow; i++)
+      REAL(ans)[i+j*nrow] = gsl_matrix_get(substModel, i, j);
+
+  SET_DIMNAMES(ans, GET_DIMNAMES(probMatR));
+  gsl_matrix_free(substModel);
+  gsl_matrix_free(probMat);
+  UNPROTECT(1);
+  return ans;
 }
 
