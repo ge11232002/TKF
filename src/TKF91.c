@@ -5,7 +5,7 @@ double TKF91LikelihoodFunction(int *seq1Int, int *seq2Int, double len,
     gsl_vector *eqFrequencies, int SA, int SB){
   double lambda = len / (len + 1.0) * mu;
   double alpha = -mu * distance;
-  double lmt = exp((lambda-mu)*distance);
+  //double lmt = exp((lambda-mu)*distance);
   double lbeta = gsl_log1p(-exp((lambda-mu)*distance)) - (log(mu) + gsl_log1p(-lambda/mu * exp((lambda-mu)*distance)));
   double beta = exp(lbeta); // beta is  not a very small number.
   double P1t = exp(- mu * distance) * (1.0 - lambda * beta);

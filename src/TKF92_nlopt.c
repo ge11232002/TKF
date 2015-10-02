@@ -65,7 +65,7 @@ SEXP TKF92LikelihoodFunction3DMain_nlopt(SEXP seq1IntR, SEXP seq2IntR,
 
   // nlopt main procedure
   double lb[3] = {0.0494497, 1e-20, 1e-20}; // lower bounds
-  double ub[3] = {2000, 1-1e-20, 1-1e-20};  // upper bounds
+  double ub[3] = {2000, 0.1, 1-1e-20};  // upper bounds
   //double dx[3] = {20, 0.01, 0.1}; // The initial step size
 
   nlopt_opt opt;

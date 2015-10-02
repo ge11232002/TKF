@@ -1,2 +1,4 @@
-PKG_LIBS += -L$(LIB_GSL)$(R_ARCH)/lib -lgsl -lgslcblas -lnlopt -lm
-PKG_CPPFLAGS += -I$(RHOME)/src/include -I$(LIB_GSL)$(R_ARCH)/include
+# C Compiler options
+PKG_CFLAGS = -I"$(NLOPT_HOME)$(R_ARCH)/include" -I$(LIB_GSL)/include
+PKG_LIBS = -L"$(NLOPT_HOME)$(R_ARCH)/lib" -lnlopt_cxx -L$(LIB_GSL)/lib -lgsl -lgslcblas
+

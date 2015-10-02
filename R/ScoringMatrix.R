@@ -83,11 +83,16 @@ AAToInt <- function(AA){
 ### Different from Darwin, here PAM1[i,j] means the transition probability
 ### from i to j.
 ### Exported!
-PAMn <- function(PAM1, n){
+PAMn <- function(PAM1, n, method=c("R", "C")){
   ## Validated by Darwin
   .validatePAMMatrix(PAM1)
-  ans <- expm.Higham08(n * logm(PAM1))
-  dimnames(ans) <- dimnames(PAM1)
+  method <- match.arg(method)
+  if(method == "R"){
+    ans <- expm.Higham08(n * logm(PAM1))
+    dimnames(ans) <- dimnames(PAM1)
+  }else{
+    ans <- .Call("PAMnR", PAM1, n)  
+  }
   return(ans)
 }
 ### PAM250 <- PAMn(GONNET, 250)

@@ -10,7 +10,7 @@
   from the mutation matrix at PAM 1 and base backrgound frequency.
 }
 \usage{
-  PAMn(PAM1, n)
+  PAMn(PAM1, n, method=c("R", "C"))
   Dayhoffn(PAM1, BF, n)
 }
 
@@ -22,6 +22,10 @@
   }
   \item{n}{
     A \link{numeric}: the PAM distance.
+  }
+  \item{method}{
+    The implementation can be in R or C.
+    Usually R is fine. C is for debug.
   }
   \item{BF}{
     A \link{numeric} vector: the backrgound frequency of AAs.
@@ -57,7 +61,7 @@ Gonnet, G.H., and Scholl, R. (2009). Scientific Computation (Cambridge, UK; New 
   data(GONNET)
   data(GONNETBF)
   ## PAM 250 mutation matrix
-  PAM250 <- PAMn(GONNET, 250)
+  PAM250 <- PAMn(GONNET, 250, method="R")
   
   ## Dayhoff 250 matrix
   Dayhoff250 <- Dayhoffn(GONNET, GONNETBF, 250)
