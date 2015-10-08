@@ -4,7 +4,6 @@ AC_PREREQ(2.61)
 # Process this file with autoconf to produce a configure script.
 AC_INIT([TKF], [0.1.1])
 
-# The nlopt part is based on the nloptr package 
 # We are using C
 AC_LANG(C)
 AC_PROG_CC
@@ -35,7 +34,7 @@ AC_ARG_WITH([nlopt-libs],
 ##
 if test x"${nlopt_libs}" == x""; then
     if test x"${PKGCONFIG}" == x"yes"; then
-        ## check via pkg-config for hiredis
+        ## check via pkg-config for nlopt
         if pkg-config --exists nlopt; then
             ## obtain cflags and obtain libs
             nlopt_cflags=$(pkg-config --cflags nlopt)
@@ -58,7 +57,7 @@ CPPFLAGS="${nlopt_cflags} ${CPPFLAGS}"
 CXXFLAGS="${nlopt_cflags} ${CXXFLAGS}"
 CFLAGS="${nlopt_cflags} ${CFLAGS}"
 
-## check for headers Debian has in libhiredis-dev
+## check for headers 
 AC_MSG_NOTICE([Now testing for NLopt header file.])
 nlopt_header=nlopt.h
 AC_CHECK_HEADER([$nlopt_header],
