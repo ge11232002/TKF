@@ -47,7 +47,8 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    invHessian <- chol2inv(chol(ansHessian))
+    #invHessian <- chol2inv(chol(ansHessian))
+    invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1],
              "MuVariance"=invHessian[2,2],
              "coVariance"=invHessian[1,2]))
@@ -67,7 +68,8 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  mu=mu, expectedLength=expectedLength,
                  substModel=substModel, 
                  substModelBF=substModelBF)
-    invHessian <- chol2inv(chol(ansHessian))
+    #invHessian <- chol2inv(chol(ansHessian))
+    invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance)){
     ## Just calculate the likelihood, given mu and distance
@@ -84,7 +86,8 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    invHessian <- chol2inv(chol(ansHessian))
+    #invHessian <- chol2inv(chol(ansHessian))
+    invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1],
              "MuVariance"=invHessian[2,2],
              "coVariance"=invHessian[1,2]))

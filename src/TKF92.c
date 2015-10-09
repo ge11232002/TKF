@@ -341,7 +341,7 @@ SEXP TKF92LikelihoodFunctionWrapper(SEXP seq1IntR, SEXP seq2IntR, SEXP distanceR
 }
 
 double TKF92LikelihoodFunction3D(const gsl_vector *v,  void *params){
-  /*if(gsl_vector_ispos(v) != 1){
+  if(gsl_vector_ispos(v) != 1){
     return GSL_POSINF;
   }
   if(gsl_vector_get(v, 1) >= 1){
@@ -349,7 +349,7 @@ double TKF92LikelihoodFunction3D(const gsl_vector *v,  void *params){
   }
   if(gsl_vector_get(v, 2) >= 1){
     return GSL_POSINF;
-  }*/
+  }
   double distance, mu, r;
   struct TKF92LikelihoodFunction3D_params *p = (struct TKF92LikelihoodFunction3D_params *) params;
   double len = p->len;
