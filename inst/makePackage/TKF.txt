@@ -9,9 +9,9 @@ clang -I/usr/local/Cellar/r/3.2.2/R.framework/Resources/include -DNDEBUG  -I/usr
 clang -I/usr/local/Cellar/r/3.2.2/R.framework/Resources/include -DNDEBUG  -I/usr/local/opt/gettext/include -I/usr/local/opt/readline/include -I/usr/local/opt/openssl/include   -I/usr/local/Cellar/gsl/1.16/include -I/usr/local/Cellar/nlopt/2.4.2/include  -fPIC  -g -O2  -c matrix.c -o matrix.o
 clang -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/Cellar/r/3.2.2/R.framework/Resources/lib -L/usr/local/opt/gettext/lib -L/usr/local/opt/readline/lib -L/usr/local/opt/openssl/lib -o TKF.so MathFunctions.o R_init_TKF.o TKF91.o TKF91_nlopt.o TKF92.o TKF92HG.o TKF92HG_nlopt.o TKF92_nlopt.o matrix.o -L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas -L/usr/local/Cellar/nlopt/2.4.2/lib -lnlopt -lm -F/usr/local/Cellar/r/3.2.2/R.framework/.. -framework R -lintl -Wl,-framework -Wl,CoreFoundation
 
-R_stable CMD build  TKF
-R_stable CMD INSTALL TKF_0.1.4.tar.gz
-R_stable CMD check --run-donttest --as-cran TKF_0.1.4.tar.gz
+R CMD build  TKF
+R CMD INSTALL TKF_0.1.6.tar.gz
+R CMD check --run-donttest --as-cran TKF_0.1.6.tar.gz
 
 
 ### Mac

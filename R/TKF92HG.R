@@ -38,7 +38,7 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                                           x)}
                         )
       ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
-    }if(method =="gsl"){
+    }else if(method =="gsl"){
       ans <- .Call("TKF92HGLikelihoodFunction5DMainNM", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF)
     }else{

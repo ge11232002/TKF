@@ -12,11 +12,11 @@
 }
 \usage{
 TKF92HG(fasta, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, 
-        method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+        method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
         expectedLength=362, 
         substModel, substModelBF)
 TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
-            method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+            method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
             expectedLength=362, substModel, substModelBF)
 }
 
@@ -63,9 +63,11 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
   \item{method}{
     When mu, r and distance are co-estimated,
     the optimisation method can be one of 
-    "all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
-    When it is "all", it will choose the best algorithm based on 
-    the minimal negative log-likelihood.
+    "gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
+    When the method is "gsl", 
+    the implementation of "nmsimplex2" from gsl is used.
+    When it is "nlopt", it will choose the best algorithm from nlopt package 
+    based on the minimal negative log-likelihood. 
     
     This argument is ignored when only distance is being estimated.
   }
@@ -98,9 +100,15 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
   the other with slow substitution rates.
   This model also assumes the fragment size distribution of these two fragments is identical.
   
-  The 5D optimisation are based on the library "nlopt".
+  The default multidimentional optimisation is "nmsimplex2" from the 
+  gsl library \url{http://www.gnu.org/software/gsl/}.
+  
+  The rest of the multidimentional optimisation implementations 
+  are based on the library "nlopt".
   More details regarding the algorithms, please go to 
   \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
+  
+  The one dimentional optimisation implmentation is the "brent" from gsl library.
 }
 
 \value{

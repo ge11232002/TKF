@@ -11,11 +11,11 @@
 }
 \usage{
 TKF91(fasta, mu=NULL, 
-      method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+      method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
       expectedLength=362, 
       substModel, substModelBF)
 TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
-          method=c("all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+          method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
           expectedLength=362, substModel, substModelBF)
 }
 
@@ -38,9 +38,11 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   \item{method}{
     When mu and distance are co-estimated,
     the optimisation method can be one of 
-    "all", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
-    When it is "all", it will choose the best algorithm based on 
-    the minimal negative log-likelihood.
+    "gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
+    When the method is "gsl", 
+    the implementation of "nmsimplex2" from gsl is used.
+    When it is "nlopt", it will choose the best algorithm from nlopt package 
+    based on the minimal negative log-likelihood. 
     
     This argument is ignored when only distance is being estimated.
   }
@@ -67,9 +69,15 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   Currently this implementation only supports the normal 20 AAs.
   Missing or Ambiguous characters are not supported.
   
-  The 2D optimisation are based on the library "nlopt".
+  The default multidimentional optimisation is "nmsimplex2" from the 
+  gsl library \url{http://www.gnu.org/software/gsl/}.
+  
+  The rest of the multidimentional optimisation implementations 
+  are based on the library "nlopt".
   More details regarding the algorithms, please go to 
   \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
+  
+  The one dimentional optimisation implmentation is the "brent" from gsl library.
 }
 
 \value{
@@ -113,5 +121,4 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
             substModel=GONNET, substModelBF=GONNETBF)
   }
 }
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
