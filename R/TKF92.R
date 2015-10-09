@@ -46,12 +46,13 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1],
-             "MuVariance"=solve(ansHessian)[2,2],
-             "rVariance"=solve(ansHessian)[3,3],
-             "coVariancePAMMu"=solve(ansHessian)[1,2],
-             "coVariancePAMr"=solve(ansHessian)[1,3],
-             "coVarianceMur"=solve(ansHessian)[2,3]
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "rVariance"=invHessian[3,3],
+             "coVariancePAMMu"=invHessian[1,2],
+             "coVariancePAMr"=invHessian[1,3],
+             "coVarianceMur"=invHessian[2,3]
              )
            )
   }else if(!is.null(mu) && is.null(distance) && !is.null(r)){
@@ -66,7 +67,8 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                  mu=mu, r=r, expectedLength=expectedLength,
                  substModel=substModel, 
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1]))
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance) && !is.null(r)){
     ## Just calculate the likelihood, given mu and distance
     ans <- .Call("TKF92LikelihoodFunctionWrapper", seq1Int, seq2Int, 
@@ -78,12 +80,13 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1],
-             "MuVariance"=solve(ansHessian)[2,2],
-             "rVariance"=solve(ansHessian)[3,3],
-             "coVariancePAMMu"=solve(ansHessian)[1,2],
-             "coVariancePAMr"=solve(ansHessian)[1,3],
-             "coVarianceMur"=solve(ansHessian)[2,3]
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "rVariance"=invHessian[3,3],
+             "coVariancePAMMu"=invHessian[1,2],
+             "coVariancePAMr"=invHessian[1,3],
+             "coVarianceMur"=invHessian[2,3]
              )
            )
   }else{

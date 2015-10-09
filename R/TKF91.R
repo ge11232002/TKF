@@ -41,9 +41,10 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1],
-             "MuVariance"=solve(ansHessian)[2,2],
-             "coVariance"=solve(ansHessian)[1,2]))
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "coVariance"=invHessian[1,2]))
   }else if(!is.null(mu) && is.null(distance)){
     ## Do the 1D distance optimisation
     ans <- .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu,
@@ -56,7 +57,8 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  mu=mu, expectedLength=expectedLength,
                  substModel=substModel, 
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1]))
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance)){
     ## Just calculate the likelihood, given mu and distance
     ans <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, 
@@ -68,9 +70,10 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    return(c(ans, "PAMVariance"=solve(ansHessian)[1,1],
-             "MuVariance"=solve(ansHessian)[2,2],
-             "coVariance"=solve(ansHessian)[1,2]))
+    invHessian <- chol2inv(chol(ansHessian))
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "coVariance"=invHessian[1,2]))
   }else{
     stop("You cannot estimate mu alone!")
   }
