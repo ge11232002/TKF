@@ -4,7 +4,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                       ## r: the probability in the geometric distribution 
                       ## of fragment length. By default, it should be 0.8480
                       ## from median of r values of Fungi dataset.
-                      method=c("all", "NM", "Sbplx", "COBYLA",
+                      method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA",
                                "BOBYQA", "PRAXIS"),
                       expectedLength=362, 
                       substModel, substModelBF){
@@ -25,7 +25,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance) && is.null(r)){ 
     ## Do the 3D optimisation
-    if(method == "all"){
+    if(method == "nlopt"){
       ## We try all the optimisation methods and select the best one
       ans_all <- lapply(methodsOpt,
                         function(x){.Call("TKF92LikelihoodFunction3DMain_nlopt",
@@ -35,6 +35,9 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                                           x)}
                         )
       ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
+    }else if(method == "gsl"){
+      ans <- .Call("TKF92LikelihoodFunction3DMainNM", seq1Int, seq2Int,
+                   expectedLength, substModel, substModelBF)
     }else{
       ans <- .Call("TKF92LikelihoodFunction3DMain_nlopt", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF, method)
@@ -107,7 +110,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
 }
 
 TKF92 <- function(fasta, mu=NULL, r=NULL, 
-                  method=c("all", "NM", "Sbplx", "COBYLA",
+                  method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA",
                            "BOBYQA", "PRAXIS"),
                   expectedLength=362,
                   substModel, substModelBF){

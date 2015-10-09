@@ -1,7 +1,7 @@
 TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                       ## mu: by default is 0.001 from median of mu values 
                       ## from Fungi dataset.
-                      method=c("all", "NM", "Sbplx", "COBYLA", 
+                      method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA", 
                                "BOBYQA", "PRAXIS"),
                       expectedLength=362, 
                       substModel, substModelBF){
@@ -21,7 +21,7 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance)){ 
     ## Do the 2D optimisation
-    if(method == "all"){
+    if(method == "nlopt"){
       ## We try all the optimisation methods and select the best one
       ans_all <- lapply(methodsOpt, 
                         function(x){.Call("TKF91LikelihoodFunction2DMain_nlopt",
@@ -29,7 +29,9 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                                           substModel, substModelBF, x)}
                         )
       ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
-
+    }else if(method == "gsl"){
+      ans <- .Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int,
+                   expectedLength, substModel, substModelBF)
     }else{
       ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF, method)
@@ -93,7 +95,7 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
 
 
 TKF91 <- function(fasta, mu=NULL, 
-                  method=c("all", "NM", "Sbplx", "COBYLA", 
+                  method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA", 
                            "BOBYQA", "PRAXIS"),
                   expectedLength=362, 
                   substModel, substModelBF){
