@@ -31,7 +31,7 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
     if(method == "all"){
       ## We try all the optimisation methods and select the best one
       ans_all <- lapply(methodsOpt,
-                        function(x){.Call("TKF92HGLikelihoodFunction5DMain_nlopt",
+                   function(x){.Call("TKF92HGLikelihoodFunction5DMain_nlopt",
                                           seq1Int, seq2Int,
                                           expectedLength,
                                           substModel, substModelBF,
@@ -42,8 +42,12 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
       ans <- .Call("TKF92HGLikelihoodFunction5DMain_nlopt", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF, method)
     }
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], x[3], x[4], x[5], expectedLength, substModel, substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
+                                   substModel, substModelBF){
+                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x[1], x[2], x[3], 
+                                           x[4], x[5], expectedLength, 
+                                           substModel, substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, c(ans["PAM"], ans["Mu"], ans["r"], ans["Ps"], ans["Kf"]),
                  seq1Int=seq1Int, seq2Int=seq2Int,
@@ -66,8 +70,12 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
     ans <- .Call("TKF92HGLikelihoodFunction1DMain", seq1Int, seq2Int, mu, r, 
                  Ps, Kf, 
                  expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, r, Ps, Kf, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, x, mu, r, Ps, Kf, expectedLength, substModel, substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, r, Ps, Kf, 
+                                   expectedLength, substModel, substModelBF){
+                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x, mu, r, Ps, Kf, 
+                                           expectedLength, substModel, 
+                                           substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, ans["PAM"], 
                  seq1Int=seq1Int, seq2Int=seq2Int,
@@ -75,12 +83,18 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                  substModel=substModel, 
                  substModelBF=substModelBF)
     return(c(ans, "PAMVariance"=solve(ansHessian)[1,1]))
-  }else if(!is.null(mu) && !is.null(distance) && !is.null(r) && !is.null(Ps) && !is.null(Kf)){
+  }else if(!is.null(mu) && !is.null(distance) && !is.null(r) && 
+           !is.null(Ps) && !is.null(Kf)){
     ## Just calculate the likelihood, given mu and distance, r, Ps, Kf
     ans <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, 
-                 distance, mu, r, Ps, Kf, expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], x[3], x[4], x[5], expectedLength, substModel, substModelBF)
+                 distance, mu, r, Ps, Kf, expectedLength, substModel, 
+                 substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
+                                   substModel, substModelBF){
+                          ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x[1], x[2], x[3], 
+                                           x[4], x[5], expectedLength, 
+                                           substModel, substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, c(ans["PAM"], ans["Mu"], ans["r"], ans["Ps"], ans["Kf"]),
                  seq1Int=seq1Int, seq2Int=seq2Int,

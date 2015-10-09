@@ -34,8 +34,12 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
       ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF, method)
     }
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], expectedLength, substModel, substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
+                                   substModel, substModelBF){
+                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x[1], x[2], 
+                                           expectedLength, substModel, 
+                                           substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, c(ans["PAM"], ans["Mu"]),
                  seq1Int=seq1Int, seq2Int=seq2Int,
@@ -49,8 +53,12 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
     ## Do the 1D distance optimisation
     ans <- .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu,
                  expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, x, mu, expectedLength, substModel, substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, expectedLength, 
+                                   substModel, substModelBF){
+                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x, mu, 
+                                           expectedLength, substModel, 
+                                           substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, ans["PAM"], 
                  seq1Int=seq1Int, seq2Int=seq2Int,
@@ -63,8 +71,12 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
     ## Just calculate the likelihood, given mu and distance
     ans <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, 
                  distance, mu, expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, substModel, substModelBF){
-                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", seq1Int, seq2Int, x[1], x[2], expectedLength, substModel, substModelBF)
+    ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
+                                   substModel, substModelBF){
+                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
+                                           seq1Int, seq2Int, x[1], x[2], 
+                                           expectedLength, substModel, 
+                                           substModelBF)
                           return(ansTemp["negLogLikelihood"])
                  }, c(ans["PAM"], ans["Mu"]),
                  seq1Int=seq1Int, seq2Int=seq2Int,
