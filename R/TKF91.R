@@ -47,8 +47,12 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    #invHessian <- chol2inv(chol(ansHessian))
-    invHessian <- solve(ansHessian)
+    if(any(is.nan(ansHessian))){
+      message("Hessian matrix calculation failed on current optimal points! Use the same values as variance.")
+      invHessian <- matrix(c(ans["PAM"], NaN, NaN, ans["Mu"]), ncol=2)
+    }else{
+      invHessian <- solve(ansHessian)
+    }
     return(c(ans, "PAMVariance"=invHessian[1,1],
              "MuVariance"=invHessian[2,2],
              "coVariance"=invHessian[1,2]))
