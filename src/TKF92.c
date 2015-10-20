@@ -406,7 +406,7 @@ SEXP TKF92LikelihoodFunction1DMain(SEXP seq1IntR, SEXP seq2IntR, SEXP muR,
 
   // GSL minimizer 
   int status;
-  int iter = 0, max_iter = 100;
+  int iter = 0, max_iter = 1000;
   const gsl_min_fminimizer_type *T;
   gsl_min_fminimizer *s;
   gsl_function F;
