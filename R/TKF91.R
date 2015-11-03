@@ -1,8 +1,36 @@
+TKF91LikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int, 
+                                            mu, expectedLength,
+                                            substModel, substModelBF){
+  ansTemp <- .Call("TKF91LikelihoodFunctionWrapper",
+                   seq1Int, seq2Int, x, mu,
+                   expectedLength, substModel,
+                   substModelBF)
+  return(ansTemp["negLogLikelihood"])
+}
+
+smartOptimBrent <- function(fn, par, lower, upper, ...){
+  res <- optim(par, TKF91LikelihoodFunctionWrapperR,
+               gr=NULL, ..., 
+               method="Brent",
+               lower=lower, upper=upper, hessian=TRUE)
+  if(isTRUE(all.equal(res$par[1], lower, tolerance=1e-4))){
+    lower <- lower * 1.1
+    res <- smartOptimBrent(fn, par, lower=lower, upper=upper, ...)
+  }
+  if(isTRUE(all.equal(res$par[1], upper, tolerance=1e-4))){
+    upper <- upper * 0.9
+    res <- smartOptimBrent(fn, par, lower=lower, upper=upper, ...)
+  }
+  return(res)
+}
+
+
 TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                       ## mu: by default is 0.001 from median of mu values 
                       ## from Fungi dataset.
                       method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA", 
                                "BOBYQA", "PRAXIS"),
+                      method1D=c("optim", "brent", "optimise"),
                       expectedLength=362, 
                       substModel, substModelBF){
   if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
@@ -10,6 +38,7 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
          paste(AACharacterSet, collapse=" "))
   }
   method <- match.arg(method)
+  method1D <- match.arg(method1D)
   methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
@@ -58,20 +87,42 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
              "coVariance"=invHessian[1,2]))
   }else if(!is.null(mu) && is.null(distance)){
     ## Do the 1D distance optimisation
+    if(method1D == "brent"){
+      message("Using method: ", method1D)
     ans <- .Call("TKF91LikelihoodFunction1DMain", seq1Int, seq2Int, mu,
                  expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, expectedLength, 
-                                   substModel, substModelBF){
-                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
-                                           seq1Int, seq2Int, x, mu, 
-                                           expectedLength, substModel, 
-                                           substModelBF)
-                          return(ansTemp["negLogLikelihood"])
-                 }, ans["PAM"], 
+    ansHessian <- hessian(TKF91LikelihoodFunctionWrapperR,
+                 ans["PAM"], 
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  mu=mu, expectedLength=expectedLength,
                  substModel=substModel, 
                  substModelBF=substModelBF)
+    }else if(method1D == "optimise"){
+      message("Using method: ", method1D)
+      distanceMin <- optimise(TKF91LikelihoodFunctionWrapperR,
+                 interval=c(0.0494497, 1000), 
+                 seq1Int=seq1Int, seq2Int=seq2Int,
+                 mu=mu, expectedLength=expectedLength,
+                 substModel=substModel,
+                 substModelBF=substModelBF)
+      ansHessian <- hessian(TKF91LikelihoodFunctionWrapperR,
+                            distanceMin$minimum,
+                            seq1Int=seq1Int, seq2Int=seq2Int,
+                            mu=mu, expectedLength=expectedLength,
+                            substModel=substModel,
+                            substModelBF=substModelBF)
+      ans <- c("PAM"=distanceMin$minimum, "Mu"=mu, 
+               "negLogLikelihood"=distanceMin$objective)
+    }else if(method1D == "optim"){
+      message("Using method: ", method1D)
+      res <- smartOptimBrent(TKF91LikelihoodFunctionWrapperR, par=100,
+                             lower=0.0494497, upper=2000,
+                   seq1Int=seq1Int, seq2Int=seq2Int,
+                   mu=mu, expectedLength=expectedLength,
+                   substModel=substModel, substModelBF=substModelBF)
+      ansHessian <- res$hessian
+      ans <- c("PAM"=res$par[1], "Mu"=mu, "negLogLikelihood"=res$value)
+    }
     #invHessian <- chol2inv(chol(ansHessian))
     invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1]))
@@ -104,9 +155,11 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
 TKF91 <- function(fasta, mu=NULL, 
                   method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA", 
                            "BOBYQA", "PRAXIS"),
+                  method1D=c("optim", "brent", "optimise"),
                   expectedLength=362, 
                   substModel, substModelBF){
   method <- match.arg(method)
+  method1D <- match.arg(method1D)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
   distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
@@ -120,7 +173,8 @@ TKF91 <- function(fasta, mu=NULL,
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
       ans <- TKF91Pair(fasta[[i]], fasta[[j]], 
-                       mu=mu, method=method, expectedLength=expectedLength,
+                       mu=mu, method=method, method1D=method1D,
+                       expectedLength=expectedLength,
                        substModel=substModel, substModelBF=substModelBF)
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
