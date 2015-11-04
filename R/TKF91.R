@@ -38,7 +38,6 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
          paste(AACharacterSet, collapse=" "))
   }
   method <- match.arg(method)
-  #method1D <- match.arg(method1D)
   methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
@@ -122,8 +121,6 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
                    substModel=substModel, substModelBF=substModelBF)
       ansHessian <- res$hessian
       ans <- c("PAM"=res$par[1], "Mu"=mu, "negLogLikelihood"=res$value)
-    #}
-    #invHessian <- chol2inv(chol(ansHessian))
     invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance)){
@@ -156,9 +153,9 @@ TKF91 <- function(fasta, mu=NULL,
                   method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA", 
                            "BOBYQA", "PRAXIS"),
                   expectedLength=362, 
-                  substModel, substModelBF){
+                  substModel, substModelBF,
+                  skipFailure=FALSE){
   method <- match.arg(method)
-  #method1D <- match.arg(method1D)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
   distanceMatrix <- matrix(NA, ncol=nSeqs, nrow=nSeqs,
@@ -172,10 +169,19 @@ TKF91 <- function(fasta, mu=NULL,
   for(i in 1:(nSeqs-1L)){
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
+      if(skipFailure){
+        ans <- try(TKF91Pair(fasta[[i]], fasta[[j]],
+                             mu=mu, method=method,
+                             expectedLength=expectedLength,
+                             substModel=substModel, substModelBF=substModelBF))
+        if(class(ans) == "try-error")
+          next
+      }else{
       ans <- TKF91Pair(fasta[[i]], fasta[[j]], 
                        mu=mu, method=method,
                        expectedLength=expectedLength,
                        substModel=substModel, substModelBF=substModelBF)
+      }
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
       negLoglikelihoodMatrix[i,j] <- negLoglikelihoodMatrix[j,i] <- 
