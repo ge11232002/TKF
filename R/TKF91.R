@@ -9,6 +9,7 @@ TKF91LikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int,
 }
 
 smartOptimBrent <- function(fn, par, lower, upper, ...){
+  message("The range is ", lower, " to ", upper)
   res <- optim(par, TKF91LikelihoodFunctionWrapperR,
                gr=NULL, ..., 
                method="Brent",
@@ -37,7 +38,7 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
          paste(AACharacterSet, collapse=" "))
   }
   method <- match.arg(method)
-  method1D <- match.arg(method1D)
+  #method1D <- match.arg(method1D)
   methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
@@ -157,11 +158,12 @@ TKF91 <- function(fasta, mu=NULL,
                   expectedLength=362, 
                   substModel, substModelBF){
   method <- match.arg(method)
-  method1D <- match.arg(method1D)
+  #method1D <- match.arg(method1D)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
-  distanceMatrix <- matrix(0, ncol=nSeqs, nrow=nSeqs,
+  distanceMatrix <- matrix(NA, ncol=nSeqs, nrow=nSeqs,
                            dimnames=list(seqnames, seqnames))
+  diag(distanceMatrix) <- 0
   varianceMatrix <- distanceMatrix
   if(is.null(mu)){
     muMatrix <- distanceMatrix
