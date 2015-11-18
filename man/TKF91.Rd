@@ -13,7 +13,7 @@
 TKF91(fasta, mu=NULL, 
       method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
       expectedLength=362, 
-      substModel, substModelBF)
+      substModel, substModelBF, skipFailure=FALSE)
 TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
           method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
           expectedLength=362, substModel, substModelBF)
@@ -63,6 +63,11 @@ TKF91Pair(seq1, seq2, mu=NULL, distance=NULL,
   \item{seq1, seq2}{
     A vector of \link{character}: the sequences of two proteins to compare.
   }
+  \item{skipFailure}{
+    If TRUE, it will skip the failed optimisation of the paired sequences and
+    continue to the next pair.
+    If FALSE, an error will be raised.
+  }
 }
 
 \details{
@@ -111,7 +116,7 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
                       seqtype="AA", set.attributes=FALSE)
   ## 1D estimation: only distance
   TKF91(fasta, mu=5.920655e-04, 
-        substModel=GONNET, substModelBF=GONNETBF)
+        substModel=GONNET, substModelBF=GONNETBF, skipFailure=FALSE)
   ## 2D estimation: joint estimation of distance and mu
   TKF91(fasta, substModel=GONNET, substModelBF=GONNETBF, method="NM")
   ## only apply to a pair of sequences

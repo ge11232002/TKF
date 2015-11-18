@@ -120,7 +120,8 @@ TKF92 <- function(fasta, mu=NULL, r=NULL,
                   method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA",
                            "BOBYQA", "PRAXIS"),
                   expectedLength=362,
-                  substModel, substModelBF){
+                  substModel, substModelBF,
+                  skipFailure=FALSE){
   method <- match.arg(method)
   seqnames <- names(fasta)
   nSeqs <- length(fasta)
@@ -135,9 +136,19 @@ TKF92 <- function(fasta, mu=NULL, r=NULL,
   for(i in 1:(nSeqs-1L)){
     for(j in (i+1L):nSeqs){
       message(seqnames[i], " vs ", seqnames[j])
-      ans <- TKF92Pair(fasta[[i]], fasta[[j]],
-                       mu=mu, r=r, method=method, expectedLength=expectedLength,
-                       substModel=substModel, substModelBF=substModelBF)
+      if(skipFailure){
+        ans <- try(TKF92Pair(fasta[[i]], fasta[[j]],
+                             mu=mu, r=r, method=method, 
+                             expectedLength=expectedLength,
+                             substModel=substModel, substModelBF=substModelBF))
+        if(class(ans) == "try-error")
+          next
+      }else{
+        ans <- TKF92Pair(fasta[[i]], fasta[[j]],
+                         mu=mu, r=r, method=method,
+                         expectedLength=expectedLength,
+                         substModel=substModel, substModelBF=substModelBF)
+      }
       distanceMatrix[i,j] <- distanceMatrix[j,i] <- ans["PAM"]
       varianceMatrix[i,j] <- varianceMatrix[j,i] <- ans["PAMVariance"]
       negLoglikelihoodMatrix[i,j] <- negLoglikelihoodMatrix[j,i] <-
