@@ -96,31 +96,15 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
     #             mu=mu, expectedLength=expectedLength,
     #             substModel=substModel, 
     #             substModelBF=substModelBF)
-    #}else if(method1D == "optimise"){
-    #  message("Using method: ", method1D)
-    #  distanceMin <- optimise(TKF91LikelihoodFunctionWrapperR,
-    #             interval=c(0.0494497, 1000), 
-    #             seq1Int=seq1Int, seq2Int=seq2Int,
-    #             mu=mu, expectedLength=expectedLength,
-    #             substModel=substModel,
-    #             substModelBF=substModelBF)
-    #  ansHessian <- hessian(TKF91LikelihoodFunctionWrapperR,
-    #                        distanceMin$minimum,
-    #                        seq1Int=seq1Int, seq2Int=seq2Int,
-    #                        mu=mu, expectedLength=expectedLength,
-    #                        substModel=substModel,
-    #                        substModelBF=substModelBF)
-    #  ans <- c("PAM"=distanceMin$minimum, "Mu"=mu, 
-    #           "negLogLikelihood"=distanceMin$objective)
     #}else if(method1D == "optim"){
-    #  message("Using method: ", method1D)
-      res <- smartOptimBrent(TKF91LikelihoodFunctionWrapperR, par=100,
-                             lower=0.0494497, upper=2000,
-                   seq1Int=seq1Int, seq2Int=seq2Int,
-                   mu=mu, expectedLength=expectedLength,
-                   substModel=substModel, substModelBF=substModelBF)
-      ansHessian <- res$hessian
-      ans <- c("PAM"=res$par[1], "Mu"=mu, "negLogLikelihood"=res$value)
+    message("Using method: brent")
+    res <- smartOptimBrent(TKF91LikelihoodFunctionWrapperR, par=100,
+                           lower=0.0494497, upper=2000,
+                           seq1Int=seq1Int, seq2Int=seq2Int,
+                           mu=mu, expectedLength=expectedLength,
+                           substModel=substModel, substModelBF=substModelBF)
+    ansHessian <- res$hessian
+    ans <- c("PAM"=res$par[1], "Mu"=mu, "negLogLikelihood"=res$value)
     invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance)){

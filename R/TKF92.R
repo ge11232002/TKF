@@ -1,3 +1,31 @@
+TKF92LikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int, 
+                                            mu, r, expectedLength,
+                                            substModel, substModelBF){
+  ansTemp <- .Call("TKF92LikelihoodFunctionWrapper",
+                   seq1Int, seq2Int, x, mu, r, 
+                   expectedLength, substModel,
+                   substModelBF)
+  return(ansTemp["negLogLikelihood"])
+}
+
+smartOptimBrentTKF92 <- function(fn, par, lower, upper, ...){
+  message("The range is ", lower, " to ", upper)
+  res <- optim(par, TKF92LikelihoodFunctionWrapperR,
+               gr=NULL, ..., 
+               method="Brent",
+               lower=lower, upper=upper, hessian=TRUE)
+  if(isTRUE(all.equal(res$par[1], lower, tolerance=1e-4))){
+    lower <- lower * 1.1
+    res <- smartOptimBrentTKF92(fn, par, lower=lower, upper=upper, ...)
+  }
+  if(isTRUE(all.equal(res$par[1], upper, tolerance=1e-4))){
+    upper <- upper * 0.9
+    res <- smartOptimBrentTKF92(fn, par, lower=lower, upper=upper, ...)
+  }
+  return(res)
+}
+
+
 TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                       ## mu: by default is 0.001 from median of mu values 
                       ## of Fungi dataset.
@@ -69,21 +97,14 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
            )
   }else if(!is.null(mu) && is.null(distance) && !is.null(r)){
     ## Do the 1D distance optimisation
-    ans <- .Call("TKF92LikelihoodFunction1DMain", seq1Int, seq2Int, mu, r, 
-                 expectedLength, substModel, substModelBF)
-    ansHessian <- hessian(function(x, seq1Int, seq2Int, mu, r, expectedLength, 
-                                   substModel, substModelBF){
-                          ansTemp <- .Call("TKF92LikelihoodFunctionWrapper", 
-                                           seq1Int, seq2Int, x, mu, r, 
-                                           expectedLength, substModel, 
-                                           substModelBF)
-                          return(ansTemp["negLogLikelihood"])
-                 }, ans["PAM"], 
-                 seq1Int=seq1Int, seq2Int=seq2Int,
-                 mu=mu, r=r, expectedLength=expectedLength,
-                 substModel=substModel, 
-                 substModelBF=substModelBF)
-    #invHessian <- chol2inv(chol(ansHessian))
+    message("Using method: brent")
+    res <- smartOptimBrentTKF92(TKF92LikelihoodFunctionWrapperR, par=100,
+                           lower=0.0494497, upper=2000,
+                           seq1Int=seq1Int, seq2Int=seq2Int,
+                           mu=mu, r=r, expectedLength=expectedLength,
+                           substModel=substModel, substModelBF=substModelBF)
+    ansHessian <- res$hessian
+    ans <- c("PAM"=res$par[1], "Mu"=mu, "r"=r, "negLogLikelihood"=res$value)
     invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1]))
   }else if(!is.null(mu) && !is.null(distance) && !is.null(r)){
@@ -101,7 +122,6 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    #invHessian <- chol2inv(chol(ansHessian))
     invHessian <- solve(ansHessian)
     return(c(ans, "PAMVariance"=invHessian[1,1],
              "MuVariance"=invHessian[2,2],
