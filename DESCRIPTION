@@ -11,7 +11,7 @@ Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>
 Imports: methods, stats, expm, numDeriv, ape (>= 3.2), phytools (>= 0.4-45), 
          phangorn (>= 1.99-12)
 Depends: R (>= 3.0.2)
-Suggests: RUnit, seqinr
+Suggests: testthat, seqinr
 SystemRequirements: gsl, nlopt
 License: GPL-2
 Type: Package
