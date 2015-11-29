@@ -6,6 +6,8 @@ test_that("test_TKF92", {
     seq2 <- fasta[[2]]
     ans <- TKF92Pair(seq1, seq2, mu = 0.0006137344, r = 0.7016089061, 
         substModel = GONNET, substModelBF = GONNETBF)
-    expect_equal(ans["PAM"], 116.6130887028, tolerance=1e-3)
+    expectedPam <- 116.6130887028
+    expect_equal(ans["PAM"], expectedPam, tolerance=1e-3,  
+                 check.attributes=FALSE)
 })
 

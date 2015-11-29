@@ -1,2 +1,4 @@
 autom4te.cache
 .Rproj.user
+src/Makevars
+config.status

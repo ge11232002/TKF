@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^autom4te\.cache$
+^config\.log$
+^Makevars$
+^config\.status$
