@@ -7,7 +7,7 @@ importFrom(numDeriv, hessian)
 importFrom(phytools, optim.phylo.ls, phyloDesign)
 importFrom(ape, rtree, multi2di, di2multi, is.binary.tree, is.rooted, unroot)
 importFrom(phangorn, nni)
-importFrom(stats, coef, lm)
+importFrom(stats, coef, lm, optim)
 
 
 ### -----------------------------------------------------------------

@@ -13,7 +13,8 @@
 TKF92(fasta, mu=NULL, r=NULL, 
       method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
       expectedLength=362, 
-      substModel, substModelBF)
+      substModel, substModelBF,
+      skipFailure=FALSE)
 TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
           method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
           expectedLength=362, substModel, substModelBF)
@@ -71,6 +72,11 @@ TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   }
   \item{seq1, seq2}{
     A vector of character: the sequences of two proteins to compare.
+  }
+  \item{skipFailure}{
+    If TRUE, it will skip the failed optimisation of the paired sequences and
+    continue to the next pair.
+    If FALSE, an error will be raised.
   }
 }
 
