@@ -32,8 +32,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                       ## r: the probability in the geometric distribution 
                       ## of fragment length. By default, it should be 0.8480
                       ## from median of r values of Fungi dataset.
-                      method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA",
-                               "BOBYQA", "PRAXIS"),
+                      method=c("NM", "constrOptim"),
                       expectedLength=362, 
                       substModel, substModelBF){
   if(!all(seq1 %in% AACharacterSet) || !all(seq2 %in% AACharacterSet)){
@@ -41,7 +40,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
          paste(AACharacterSet, collapse=" "))
   }
   method <- match.arg(method)
-  methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
+  #methodsOpt <- c("NM", "Sbplx", "COBYLA", "BOBYQA", "PRAXIS")
 
   seq1Int <- AAToInt(seq1)
   seq2Int <- AAToInt(seq2)
@@ -53,22 +52,23 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   
   if(is.null(mu) && is.null(distance) && is.null(r)){ 
     ## Do the 3D optimisation
-    if(method == "nlopt"){
-      ## We try all the optimisation methods and select the best one
-      ans_all <- lapply(methodsOpt,
-                        function(x){.Call("TKF92LikelihoodFunction3DMain_nlopt",
-                                          seq1Int, seq2Int, 
-                                          expectedLength, 
-                                          substModel, substModelBF,
-                                          x)}
-                        )
-      ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
-    }else if(method == "gsl"){
+#     if(method == "nlopt"){
+#       ## We try all the optimisation methods and select the best one
+#       ans_all <- lapply(methodsOpt,
+#                         function(x){.Call("TKF92LikelihoodFunction3DMain_nlopt",
+#                                           seq1Int, seq2Int, 
+#                                           expectedLength, 
+#                                           substModel, substModelBF,
+#                                           x)}
+#                         )
+#       ans <- ans_all[[which.min(sapply(ans_all, "[", "negLogLikelihood"))]]
+#     }else if(method == "gsl"){
+    if(method == "NM"){
       ans <- .Call("TKF92LikelihoodFunction3DMainNM", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF)
     }else{
-      ans <- .Call("TKF92LikelihoodFunction3DMain_nlopt", seq1Int, seq2Int,
-                   expectedLength, substModel, substModelBF, method)
+      #ans <- .Call("TKF92LikelihoodFunction3DMain_nlopt", seq1Int, seq2Int,
+      #             expectedLength, substModel, substModelBF, method)
     }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
                                    substModel, substModelBF){
@@ -82,7 +82,8 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
     if(any(is.nan(ansHessian))){
-      message("Hessian matrix calculation failed on current optimal points! Use the same values as variance.")
+      message("Hessian matrix calculation failed on current optimal points! 
+              Use the same values as variance.")
       invHessian <- matrix(c(ans["PAM"], NaN, NaN, ans["Mu"]), ncol=2)
     }else{
       invHessian <- solve(ansHessian)
@@ -137,8 +138,7 @@ TKF92Pair <- function(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
 }
 
 TKF92 <- function(fasta, mu=NULL, r=NULL, 
-                  method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA",
-                           "BOBYQA", "PRAXIS"),
+                  method=c("NM", "constrOptim"),
                   expectedLength=362,
                   substModel, substModelBF,
                   skipFailure=FALSE){
@@ -191,6 +191,3 @@ TKF92 <- function(fasta, mu=NULL, r=NULL,
                 negLoglikelihoodMatrix=negLoglikelihoodMatrix))
   }
 }
-
-
-

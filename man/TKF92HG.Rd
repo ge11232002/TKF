@@ -3,20 +3,22 @@
 \alias{TKF92HGPair}
 
 \title{
-  Evolutionary distance estimation with TKF92 model considering the regional heterogeneity of substitution rates
+  Evolutionary distance estimation with TKF92 model 
+  considering the regional heterogeneity of substitution rates
 }
 \description{
   This function implements the TKF92 model to estimate the pairwise distance
   from protein sequences.
-  An additional simple model of regional heterogeneity of substitution rates is used.
+  An additional simple model of regional heterogeneity of substitution rates 
+  is used.
 }
 \usage{
 TKF92HG(fasta, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, 
-        method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+        method=c("NM", "constrOptim"),
         expectedLength=362, 
         substModel, substModelBF)
 TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
-            method=c("gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS"),
+            method=c("NM", "constrOptim"),
             expectedLength=362, substModel, substModelBF)
 }
 
@@ -62,12 +64,11 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
   }
   \item{method}{
     When mu, r and distance are co-estimated,
-    the optimisation method can be one of 
-    "gsl", "nlopt", "NM", "Sbplx", "COBYLA","BOBYQA", "PRAXIS".
-    When the method is "gsl", 
+    the optimisation method can be one of "NM", "constrOptim".
+    When the method is "NM", 
     the implementation of "nmsimplex2" from gsl is used.
-    When it is "nlopt", it will choose the best algorithm from nlopt package 
-    based on the minimal negative log-likelihood. 
+    When it is "constrOptim",
+    the implementation of constrained "Nelder-Mead" from R stats is used.
     
     This argument is ignored when only distance is being estimated.
   }
@@ -154,5 +155,4 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
             substModel=GONNET, substModelBF=GONNETBF)
   }
 }
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
