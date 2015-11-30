@@ -2,10 +2,10 @@
 \alias{optim.phylo.wls}
 
 \title{
-Phylogeny inference using the weighted least squares method
+Phylogeny inference using the weighted least squares distance method
 }
 \description{
-This function performs phylogeny inference using weighted least-squares.
+This function performs phylogeny inference using weighted least-squares tree.
 }
 \usage{
 optim.phylo.wls(Dist, Var=NULL, stree=NULL, set.neg.to.zero=TRUE,
