@@ -8,6 +8,16 @@ TKF91LikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int,
   return(ansTemp["negLogLikelihood"])
 }
 
+TKF912DLikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int, 
+                                              expectedLength,
+                                              substModel, substModelBF){
+  ansTemp <- .Call("TKF91LikelihoodFunctionWrapper",
+                   seq1Int, seq2Int, x[1], x[2],
+                   expectedLength, substModel,
+                   substModelBF)
+  return(ansTemp["negLogLikelihood"])
+}
+
 smartOptimBrent <- function(fn, par, lower, upper, ...){
   message("The range is ", lower, " to ", upper)
   res <- optim(par, TKF91LikelihoodFunctionWrapperR,
@@ -60,21 +70,33 @@ TKF91Pair <- function(seq1, seq2, mu=NULL, distance=NULL,
     if(method == "NM"){
       ans <- .Call("TKF91LikelihoodFunction2DMainNM", seq1Int, seq2Int,
                    expectedLength, substModel, substModelBF)
-    }else{
+      
+    }else if(method == "constrOptim"){
       #ans <- .Call("TKF91LikelihoodFunction2DMain_nlopt", seq1Int, seq2Int,
       #             expectedLength, substModel, substModelBF, method)
+      res <- constrOptim(theta=c(100, exp(-3)),
+                         f=TKF912DLikelihoodFunctionWrapperR,
+                         grad=NULL,
+                         ui=matrix(c(1,0,-1,0,0,1,0,-1), ncol=2),
+                         ci=c(0.0494497, 1e-20, -2000, -1+1e-20),
+                         seq1Int=seq1Int, seq2Int=seq2Int,
+                         expectedLength=expectedLength,
+                         substModel=substModel, substModelBF=substModelBF
+                         )
+      ans <- c("PAM"=res$par[1], "Mu"=res$par[2], 
+               "negLogLikelihood"=unname(res$value))
     }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
                                    substModel, substModelBF){
-                          ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
-                                           seq1Int, seq2Int, x[1], x[2], 
-                                           expectedLength, substModel, 
-                                           substModelBF)
-                          return(ansTemp["negLogLikelihood"])
-                 }, c(ans["PAM"], ans["Mu"]),
-                 seq1Int=seq1Int, seq2Int=seq2Int,
-                 expectedLength=expectedLength, substModel=substModel,
-                 substModelBF=substModelBF)
+      ansTemp <- .Call("TKF91LikelihoodFunctionWrapper", 
+                       seq1Int, seq2Int, x[1], x[2], 
+                       expectedLength, substModel, 
+                       substModelBF)
+      return(ansTemp["negLogLikelihood"])
+    }, c(ans["PAM"], ans["Mu"]),
+    seq1Int=seq1Int, seq2Int=seq2Int,
+    expectedLength=expectedLength, substModel=substModel,
+    substModelBF=substModelBF)
     if(any(is.nan(ansHessian))){
       message("Hessian matrix calculation failed on current optimal points! 
               Use the same values as variance.")

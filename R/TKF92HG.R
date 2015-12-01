@@ -8,6 +8,16 @@ TKF92HGLikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int,
   return(ansTemp["negLogLikelihood"])
 }
 
+TKF925DHGLikelihoodFunctionWrapperR <- function(x, seq1Int, seq2Int, 
+                                                expectedLength,
+                                                substModel, substModelBF){
+  ansTemp <- .Call("TKF92HGLikelihoodFunctionWrapper",
+                   seq1Int, seq2Int, x[1], x[2], x[3], x[4], x[5], 
+                   expectedLength, substModel,
+                   substModelBF)
+  return(ansTemp["negLogLikelihood"])
+}
+
 smartOptimBrentTKF92HG <- function(fn, par, lower, upper, ...){
   message("The range is ", lower, " to ", upper)
   res <- optim(par, TKF92HGLikelihoodFunctionWrapperR,
@@ -72,6 +82,25 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
     }else{
       #ans <- .Call("TKF92HGLikelihoodFunction5DMain_nlopt", seq1Int, seq2Int,
       #             expectedLength, substModel, substModelBF, method)
+      res <- constrOptim(theta=c(100, exp(-3), 0.5, 0.5, 1.2),
+                         f=TKF923DLikelihoodFunctionWrapperR,
+                         grad=NULL,
+                         ui=matrix(c(1,0,-1,0,0,0,0,0,0,0, 
+                                     0,1,0,-1,0,0,0,0,0,0,
+                                     0,0,0,0,1,-1,0,0,0,0,
+                                     0,0,0,0,0,0,1,-1,0,0,
+                                     0,0,0,0,0,0,0,0,1,-1), 
+                                   ncol=5),
+                         ci=c(0.0494497, 1e-20, -2000, -1+1e-20, 
+                              1e-20, -1+1e-20, 1e-20, -1+1e-20,
+                              1,-Inf),
+                         seq1Int=seq1Int, seq2Int=seq2Int,
+                         expectedLength=expectedLength,
+                         substModel=substModel, substModelBF=substModelBF
+      )
+      ans <- c("PAM"=res$par[1], "Mu"=res$par[2], "r"=res$par[3],
+               "Ps"=res$par[4], "Kf"=res$par[5],
+               "negLogLikelihood"=unname(res$value))
     }
     ansHessian <- hessian(function(x, seq1Int, seq2Int, expectedLength, 
                                    substModel, substModelBF){
@@ -84,15 +113,26 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    ansHessianInverse <- solve(ansHessian)
-    return(c(ans, "PAMVariance"=ansHessianInverse[1,1],
-             "MuVariance"=ansHessianInverse[2,2],
-             "rVariance"=ansHessianInverse[3,3],
-             "PsVariance"=ansHessianInverse[4,4],
-             "KfVariance"=ansHessianInverse[5,5],
-             "coVariancePAMMu"=ansHessianInverse[1,2],
-             "coVariancePAMr"=ansHessianInverse[1,3],
-             "coVarianceMur"=ansHessianInverse[2,3]
+    if(any(is.nan(ansHessian))){
+      message("Hessian matrix calculation failed on current optimal points! 
+              Use the same values as variance.")
+      invHessian <- matrix(c(ans["PAM"], NaN, NaN, NaN, NaN,
+                                    NaN, ans["Mu"], NaN, NaN, NaN,
+                                    NaN, NaN, ans["r"], NaN, NaN,
+                                    NaN, NaN, NaN, ans["Ps"], NaN,
+                                    NaN, NaN, NaN, NaN, ans["Kf"]), 
+                                  ncol=5)
+    }else{
+      invHessian <- solve(ansHessian)
+    }
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "rVariance"=invHessian[3,3],
+             "PsVariance"=invHessian[4,4],
+             "KfVariance"=invHessian[5,5],
+             "coVariancePAMMu"=invHessian[1,2],
+             "coVariancePAMr"=invHessian[1,3],
+             "coVarianceMur"=invHessian[2,3]
              )
            )
   }else if(!is.null(mu) && is.null(distance) && !is.null(r) && 
@@ -142,15 +182,15 @@ TKF92HGPair <- function(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL,
                  seq1Int=seq1Int, seq2Int=seq2Int,
                  expectedLength=expectedLength, substModel=substModel,
                  substModelBF=substModelBF)
-    ansHessianInverse <- solve(ansHessian)
-    return(c(ans, "PAMVariance"=ansHessianInverse[1,1],
-             "MuVariance"=ansHessianInverse[2,2],
-             "rVariance"=ansHessianInverse[3,3],
-             "PsVariance"=ansHessianInverse[4,4],
-             "KfVariance"=ansHessianInverse[5,5],
-             "coVariancePAMMu"=ansHessianInverse[1,2],
-             "coVariancePAMr"=ansHessianInverse[1,3],
-             "coVarianceMur"=ansHessianInverse[2,3]
+    invHessian <- solve(ansHessian)
+    return(c(ans, "PAMVariance"=invHessian[1,1],
+             "MuVariance"=invHessian[2,2],
+             "rVariance"=invHessian[3,3],
+             "PsVariance"=invHessian[4,4],
+             "KfVariance"=invHessian[5,5],
+             "coVariancePAMMu"=invHessian[1,2],
+             "coVariancePAMr"=invHessian[1,3],
+             "coVarianceMur"=invHessian[2,3]
              )
            )
   }else{

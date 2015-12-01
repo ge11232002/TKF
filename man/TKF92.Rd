@@ -86,11 +86,6 @@ TKF92Pair(seq1, seq2, mu=NULL, r=NULL, distance=NULL,
   The default multidimentional optimisation is "nmsimplex2" from the 
   gsl library \url{http://www.gnu.org/software/gsl/}.
   
-  The rest of the multidimentional optimisation implementations 
-  are based on the library "nlopt".
-  More details regarding the algorithms, please go to 
-  \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
-  
   The one dimentional optimisation implmentation is the "brent" from gsl library.
 }
 
@@ -116,19 +111,21 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
 }
 \examples{
   \donttest{
-    ## This example is not tested due to running time > 5s
+  ## This example is not tested due to running time > 5s
   data(GONNET)
   data(GONNETBF)
   library(seqinr)
   fasta <- read.fasta(file.path(system.file("extdata", package="TKF"),
                       "pair1.fasta"),
                       seqtype="AA", set.attributes=FALSE)
+  
   ## 1D estimation: only distance
   TKF92(fasta, mu=0.0006137344, r=0.7016089061,
         substModel=GONNET, substModelBF=GONNETBF)
   
   ## 3D estimation: joint estimation of distance, mu and r
   TKF92(fasta, substModel=GONNET, substModelBF=GONNETBF, method="NM")
+  TKF92(fasta, substModel=GONNET, substModelBF=GONNETBF, method="constrOptim")
   
   ## only apply to a pair of sequences
   seq1 <- fasta[[1]]

@@ -25,13 +25,14 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
 \arguments{
   \item{fasta}{
     A named list of sequences in vector of characters format.
-  \code{read.fasta} from package \code{seqinr} outputs this format 
-  when reading from a fasta file.
+    \code{read.fasta} from package \code{seqinr} outputs this format 
+    when reading from a fasta file.
   }
   \item{mu}{
     A numeric value between 0 and 1 or NULL.
     It is the death rate per normal link in TKF92 model.
-    When it is NULL, a joint estimation of \code{mu}, \code{r}, \code{Ps}, \code{Kf} 
+    When it is NULL, a joint estimation of \code{mu}, \code{r}, 
+    \code{Ps}, \code{Kf} 
     and \code{distance} will be done.
     When it is given, only the distance will be estimated.
   }
@@ -39,7 +40,8 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
     A numeric value between 0 and 1 or NULL.
     It is the success probability of the geometric distribution 
     for modeling the fragment length in TKF92 model.
-    When it is NULL, a joint estimation of \code{mu}, \code{r}, \code{Ps}, \code{Kf} 
+    When it is NULL, a joint estimation of \code{mu}, \code{r}, 
+    \code{Ps}, \code{Kf} 
     and \code{distance} will be done.
     When it is given, only the distance will be estimated.
   }
@@ -47,14 +49,17 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
     A numeric value between 0 and 1 or NULL.
     It is the equilibrium frequency of slow fragments.
     Hence the equilibrium frequency of fast fragements is Pf= 1- Ps.
-    When it is NULL, a joint estimation of \code{mu}, \code{r}, \code{Ps}, \code{Kf} 
+    When it is NULL, a joint estimation of \code{mu}, \code{r}, 
+    \code{Ps}, \code{Kf} 
     and \code{distance} will be done.
     When it is given, only the distance will be estimated.
   }
   \item{Kf}{
     A numeric value larger than 1 or NULL.
-    It is the ratio of substitutions rates between fast fragments and slow fragments.
-    When it is NULL, a joint estimation of \code{mu}, \code{r}, \code{Ps}, \code{Kf} 
+    It is the ratio of substitutions rates between fast fragments and 
+    slow fragments.
+    When it is NULL, a joint estimation of \code{mu}, \code{r}, 
+    \code{Ps}, \code{Kf} 
     and \code{distance} will be done.
     When it is given, only the distance will be estimated.
   }
@@ -99,15 +104,11 @@ TKF92HGPair(seq1, seq2, mu=NULL, r=NULL, Ps=NULL, Kf=NULL, distance=NULL,
   This model assumes that there are only two varieties of fragments: 
   one with relatively fast substitution rates and 
   the other with slow substitution rates.
-  This model also assumes the fragment size distribution of these two fragments is identical.
+  This model also assumes the fragment size distribution of 
+  these two fragments is identical.
   
   The default multidimentional optimisation is "nmsimplex2" from the 
   gsl library \url{http://www.gnu.org/software/gsl/}.
-  
-  The rest of the multidimentional optimisation implementations 
-  are based on the library "nlopt".
-  More details regarding the algorithms, please go to 
-  \url{http://ab-initio.mit.edu/wiki/index.php/NLopt_Reference#Bound_constraints}.
   
   The one dimentional optimisation implmentation is the "brent" from gsl library.
 }
@@ -134,19 +135,21 @@ Gonnet, G.H., Cohen, M.A., and Benner, S.A. (1992). Exhaustive matching of the e
 }
 \examples{
   \donttest{
-    ## This example is not tested due to running time > 5s
+  ## This example is not tested due to running time > 5s
   data(GONNET)
   data(GONNETBF)
   library(seqinr)
   fasta <- read.fasta(file.path(system.file("extdata", package="TKF"),
                       "pair1.fasta"),
                       seqtype="AA", set.attributes=FALSE)
+  
   ## 1D estimation: only distance
   TKF92HG(fasta, mu=5.920655e-04, r=0.8, Ps=1, Kf=1.2,
           substModel=GONNET, substModelBF=GONNETBF)
   
   ## 5D estimation: joint estimation of distance, mu, r, Ps and Kf
   TKF92HG(fasta, substModel=GONNET, substModelBF=GONNETBF, method="NM")
+  TKF92HG(fasta, substModel=GONNET, substModelBF=GONNETBF, method="constrOptim")
   
   ## only apply to a pair of sequences
   seq1 <- fasta[[1]]
